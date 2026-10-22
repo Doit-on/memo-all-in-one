@@ -1,0 +1,1962 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memo All In One - ระบบบันทึกข้อความและเอกสารองค์กรอัตโนมัติ</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Sarabun & Prompt -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- html2pdf.js for Client-Side PDF Generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  
+  <!-- Chart.js for Executive Dashboard -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans antialiased selection:bg-sky-500 selection:text-white relative">
+
+  <!-- Ambient Glowing Mesh Background for Glassmorphism Effect -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+    <div class="absolute -top-36 -left-36 w-96 h-96 rounded-full bg-sky-400/20 blur-3xl filter"></div>
+    <div class="absolute top-1/4 -right-20 w-[30rem] h-[30rem] rounded-full bg-indigo-400/15 blur-3xl filter"></div>
+    <div class="absolute -bottom-20 left-1/4 w-[34rem] h-[34rem] rounded-full bg-teal-400/15 blur-3xl filter"></div>
+  </div>
+
+  <!-- =======================================================================
+       GATEWAY: INTERACTIVE LAMP LOGIN ANIMATION STAGE
+       ======================================================================= -->
+  <div id="lamp-login-stage" class="stage-hidden">
+    <!-- Ambient Room Dark Background -->
+    <div class="lamp-room-bg"></div>
+
+    <!-- Hanging Lamp Assembly (Swinging, Wire, Shade, Bulb, Pull-cord) -->
+    <div id="lamp-assembly" class="lamp-assembly">
+      <div class="lamp-cable"></div>
+      <div class="lamp-socket"></div>
+      <div class="lamp-shade-body"></div>
+      <div id="lamp-bulb" class="lamp-bulb"></div>
+      
+      <!-- Interactive Pull String / Cord -->
+      <div id="lamp-pull-cord" class="lamp-pull-cord" title="คลิกหรือดึงสายเพื่อเปิด/ปิดไฟ">
+        <div class="lamp-cord-line"></div>
+        <div class="lamp-pull-handle"></div>
+      </div>
+    </div>
+
+    <!-- Spotlight Cone (Illumination beam) -->
+    <div class="lamp-light-cone"></div>
+    <div class="lamp-floor-pool"></div>
+
+    <!-- Pulsing Hint when lamp is turned off -->
+    <div id="lamp-off-hint" class="lamp-off-hint" onclick="window.app.toggleLampLight()">
+      <i data-lucide="sparkles" class="w-4 h-4 text-sky-400"></i>
+      <span>คลิกที่สายโคมไฟเพื่อเปิดไฟเข้าสู่ระบบ 💡</span>
+    </div>
+
+    <!-- Illuminated Glassmorphic Login Card -->
+    <div class="lamp-login-card-container">
+      <div class="lamp-glass-card p-6 sm:p-8 space-y-5 text-white">
+        
+        <!-- Brand Header in Card -->
+        <div class="flex items-center gap-3.5 border-b border-white/10 pb-4">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 via-sky-600 to-cyan-400 flex items-center justify-center text-white shadow-lg shadow-sky-500/30 shrink-0 border border-white/20">
+            <i data-lucide="file-text" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h2 class="text-xl font-bold font-heading text-white tracking-wide">Memo All In One</h2>
+            <p class="text-xs text-sky-300 font-semibold">Corporate Document Center</p>
+          </div>
+        </div>
+
+        <!-- Role Selector Tabs -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-2">เลือกระดับการเข้าใช้งาน</label>
+          <div class="grid grid-cols-2 gap-2 p-1 bg-white/5 rounded-2xl border border-white/10">
+            <button type="button" id="lamp-role-admin" class="py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 bg-sky-600 text-white shadow-sm cursor-pointer">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+              <span>ผู้ดูแลระบบ (Admin)</span>
+            </button>
+            <button type="button" id="lamp-role-staff" class="py-2 px-3 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5 cursor-pointer">
+              <i data-lucide="user" class="w-3.5 h-3.5"></i>
+              <span>พนักงานทั่วไป (Staff)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Login Input Section -->
+        <div class="space-y-3.5">
+          <div id="lamp-pin-field-group">
+            <div class="flex items-center justify-between mb-1.5">
+              <label class="block text-xs font-semibold text-slate-300">รหัสผ่านยืนยัน (PIN Code)</label>
+              <button type="button" id="lamp-btn-autofill-pin" class="text-[11px] text-sky-400 hover:text-sky-300 font-semibold cursor-pointer">
+                คลิกใส่รหัส memoadmin
+              </button>
+            </div>
+            <div class="relative">
+              <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+              <input type="password" id="lamp-login-pin-input" placeholder="ใส่รหัสผ่าน..." class="w-full text-sm pl-10 pr-4 py-2.5 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:bg-white/15 transition font-mono tracking-wider">
+            </div>
+            <p id="lamp-login-error" class="hidden text-xs text-rose-400 font-medium mt-1.5 flex items-center gap-1">
+              <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>
+              <span>รหัสผ่านไม่ถูกต้อง โปรดลองอีกครั้ง</span>
+            </p>
+          </div>
+
+          <!-- Quick Info Pill -->
+          <div class="p-2.5 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-400 flex items-center gap-2">
+            <i data-lucide="sparkles" class="w-4 h-4 text-sky-400 shrink-0"></i>
+            <span>ระบบรันเลขที่อัตโนมัติ 3 บริษัท พรีวิว A4 เรียลไทม์ และสำรอง Drive</span>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="button" id="lamp-btn-enter-app" class="w-full py-3 rounded-2xl bg-gradient-to-r from-sky-600 via-sky-500 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white font-bold text-sm shadow-lg shadow-sky-600/35 transition flex items-center justify-center gap-2 cursor-pointer transform hover:-translate-y-0.5">
+            <span>เข้าสู่ระบบจัดการเอกสาร</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Footer Card Hint -->
+        <div class="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
+          <span>คลิกสายโคมไฟเพื่อเปิด/ปิดไฟ</span>
+          <button type="button" onclick="window.app.toggleLampLight()" class="text-sky-400 hover:text-sky-300 font-medium flex items-center gap-1 cursor-pointer">
+            <i data-lucide="lightbulb" class="w-3.5 h-3.5"></i>
+            <span id="lamp-toggle-status-text">ปิดไฟ</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       APP SHELL: SIDEBAR + MAIN CONTENT
+       ======================================================================= -->
+  <div id="app-shell" class="flex flex-1 min-h-screen overflow-hidden relative z-10">
+    
+    <!-- LEFT SIDEBAR (Collapsible & Prominent Glassmorphism) -->
+    <aside id="sidebar" class="sidebar-transition w-72 glass-sidebar text-slate-300 flex flex-col shrink-0 z-30 shadow-2xl relative">
+      
+      <!-- Brand Header with Prominent Sidebar Toggle Button -->
+      <div class="h-20 flex items-center justify-between px-4 border-b border-white/10 bg-slate-950/40">
+        <div id="sidebar-logo-full" class="flex items-center gap-3.5">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-500 via-sky-600 to-cyan-400 flex items-center justify-center text-white shadow-lg shadow-sky-500/30 shrink-0 border border-white/20">
+            <i data-lucide="file-text" class="w-6 h-6"></i>
+          </div>
+          <div class="min-w-0">
+            <h1 class="font-bold text-white tracking-wide text-lg leading-tight font-heading truncate">Memo All In One</h1>
+            <p class="text-xs text-sky-400 font-semibold tracking-wide">ระบบจัดการเอกสารองค์กร</p>
+          </div>
+        </div>
+        <div id="sidebar-logo-icon" class="hidden w-full flex justify-center">
+          <button type="button" id="sidebar-expand-btn-icon" class="w-11 h-11 rounded-2xl bg-white/10 hover:bg-sky-600 text-sky-400 hover:text-white flex items-center justify-center transition shadow-lg cursor-pointer border border-white/15" title="ขยายเมนูด้านซ้าย">
+            <i data-lucide="chevrons-right" class="w-6 h-6"></i>
+          </button>
+        </div>
+        <button type="button" id="sidebar-toggle-top-btn" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white transition cursor-pointer border border-white/10 shrink-0" title="ย่อ/ขยายเมนูด้านซ้าย">
+          <i data-lucide="chevrons-left" class="w-4 h-4" id="sidebar-toggle-icon"></i>
+        </button>
+      </div>
+
+      <!-- Navigation Links (Larger, High-Contrast & Prominent Menu) -->
+      <nav class="flex-1 py-5 px-3.5 space-y-2 overflow-y-auto">
+        <button type="button" data-view="landing" class="nav-item nav-item-active w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[15px] transition-all font-semibold group cursor-pointer text-white">
+          <div class="nav-icon-badge">
+            <i data-lucide="layout-grid" class="w-5 h-5"></i>
+          </div>
+          <span class="sidebar-label">หน้าหลัก (Home)</span>
+        </button>
+
+        <button type="button" data-view="editor" class="nav-item w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[15px] transition-all font-semibold group cursor-pointer text-slate-300">
+          <div class="nav-icon-badge">
+            <i data-lucide="file-plus-2" class="w-5 h-5"></i>
+          </div>
+          <span class="sidebar-label">สร้างเอกสารใหม่</span>
+        </button>
+
+        <button type="button" data-view="archive" class="nav-item w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[15px] transition-all font-semibold group cursor-pointer text-slate-300">
+          <div class="nav-icon-badge">
+            <i data-lucide="folder-kanban" class="w-5 h-5"></i>
+          </div>
+          <span class="sidebar-label">คลังเอกสาร &amp; ค้นหา</span>
+        </button>
+
+        <button type="button" data-view="running-logs" class="nav-item w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[15px] transition-all font-semibold group cursor-pointer text-slate-300">
+          <div class="nav-icon-badge">
+            <i data-lucide="list-ordered" class="w-5 h-5"></i>
+          </div>
+          <span class="sidebar-label">ทะเบียนคุม Running No.</span>
+        </button>
+
+        <button type="button" data-view="dashboard" class="nav-item w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[15px] transition-all font-semibold group cursor-pointer text-slate-300">
+          <div class="nav-icon-badge">
+            <i data-lucide="line-chart" class="w-5 h-5"></i>
+          </div>
+          <span class="sidebar-label">แดชบอร์ดผู้บริหาร</span>
+        </button>
+
+        <button type="button" data-view="manual" class="nav-item w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[15px] transition-all font-semibold group cursor-pointer text-slate-300 hover:text-white">
+          <div class="nav-icon-badge">
+            <i data-lucide="book-open" class="w-5 h-5"></i>
+          </div>
+          <span class="sidebar-label">คู่มือการใช้งาน (Manual)</span>
+        </button>
+
+        <div class="pt-4 mt-4 border-t border-white/10 space-y-2">
+          <!-- Google Sheets Memo List Shortcut (Enlarged Interactive Card) -->
+          <button type="button" id="btn-open-sheet-sidebar"
+             class="w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[14px] transition-all font-semibold text-emerald-300 hover:text-white hover:bg-emerald-600/20 border border-emerald-400/30 group cursor-pointer shadow-sm text-left">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 group-hover:scale-105 shrink-0 transition">
+              <i data-lucide="sheet" class="w-5 h-5 text-emerald-400"></i>
+            </div>
+            <div class="flex flex-col text-left sidebar-label leading-tight">
+              <span class="text-white">ทะเบียน Google Sheet</span>
+              <span class="text-[10px] font-normal text-emerald-300/80">เปิดดูบันทึก & รายการ</span>
+            </div>
+            <span class="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 font-bold sidebar-label">LIVE</span>
+          </button>
+
+          <!-- Google Drive Direct Shortcut (Enlarged Card) -->
+          <a href="https://drive.google.com/drive/u/0/folders/1bUQx-wtmx3iQFlV0Bknbwh45zPv35nR3" target="_blank" rel="noopener noreferrer"
+             class="w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[14px] transition-all font-semibold text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 border border-emerald-500/20 group">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 group-hover:scale-105 shrink-0 transition">
+              <i data-lucide="hard-drive-download" class="w-5 h-5"></i>
+            </div>
+            <span class="sidebar-label">Google Drive กลาง</span>
+            <i data-lucide="external-link" class="w-4 h-4 ml-auto opacity-70 sidebar-label"></i>
+          </a>
+
+          <!-- System Settings (Protected by PIN) -->
+          <button type="button" id="nav-settings-btn" class="w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-[14px] transition-all font-semibold text-slate-300 hover:text-white hover:bg-white/10 border border-white/10 group cursor-pointer">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-white/5 border border-white/10 text-slate-400 group-hover:text-white group-hover:scale-105 shrink-0 transition">
+              <i data-lucide="settings" class="w-5 h-5"></i>
+            </div>
+            <span class="sidebar-label">ตั้งค่าระบบ (Settings)</span>
+          </button>
+        </div>
+      </nav>
+
+      <!-- Sidebar Footer -->
+      <div class="p-3.5 border-t border-white/10 bg-slate-950/40">
+        <div class="flex items-center justify-between text-xs text-slate-400">
+          <span class="sidebar-label font-medium">เวอร์ชัน 1.1.0</span>
+          <div class="flex items-center gap-1">
+            <button type="button" id="btn-lock-screen" class="p-2 rounded-xl hover:bg-white/10 text-slate-400 hover:text-sky-300 transition cursor-pointer" title="ออกจากระบบ / ล็อกหน้าจอ (Lamp Screen)">
+              <i data-lucide="lock" class="w-4 h-4"></i>
+            </button>
+            <button type="button" id="sidebar-toggle-btn" class="p-2 rounded-xl hover:bg-white/10 text-slate-400 hover:text-white transition cursor-pointer" title="ย่อ/ขยายเมนูด้านซ้าย">
+              <i data-lucide="chevrons-left" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN VIEW AREA -->
+    <main id="main-content" class="flex-1 flex flex-col min-w-0 overflow-y-auto relative">
+      
+      <!-- TOPBAR (Glassmorphic) -->
+      <header class="h-16 glass-header sticky top-0 z-20 px-4 sm:px-6 flex items-center justify-between shadow-xs">
+        <div class="flex items-center gap-3 sm:gap-4">
+          <!-- Sidebar Hamburger / Toggle Button -->
+          <button type="button" id="topbar-sidebar-toggle-btn" class="p-2.5 rounded-xl bg-white/70 hover:bg-white text-slate-700 hover:text-sky-600 border border-slate-200/80 shadow-xs transition cursor-pointer" title="ย่อ/ขยายเมนูด้านซ้าย">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+          </button>
+          
+          <div class="flex items-center gap-3">
+            <div class="h-10 w-10 bg-white/90 rounded-xl flex items-center justify-center p-1.5 border border-slate-200/80 shadow-xs shrink-0 backdrop-blur-sm">
+              <img id="active-company-logo" src="assets/images/twp_logo.png" alt="Company Logo" class="max-h-full max-w-full object-contain">
+            </div>
+            <div>
+              <p class="text-[11px] text-slate-400 font-medium leading-none mb-1">บริษัทที่ใช้งานปัจจุบัน</p>
+              <h2 id="active-company-name" class="text-sm font-bold text-slate-800 font-heading truncate max-w-xs sm:max-w-md">สำนักพิมพ์ ไทยวัฒนาพานิช จำกัด</h2>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2.5 sm:gap-3">
+          <!-- Company Fast Selector -->
+          <div class="relative hidden sm:block">
+            <select id="company-selector" class="text-xs glass-input text-slate-700 font-semibold rounded-xl px-3.5 py-2 pr-8 focus:ring-2 focus:ring-sky-500 focus:outline-none appearance-none cursor-pointer">
+              <!-- Populated by JS -->
+            </select>
+            <i data-lucide="chevron-down" class="w-3.5 h-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+          </div>
+
+          <!-- Quick Open Google Sheet -->
+          <button type="button" id="btn-open-sheet-topbar" class="hidden md:flex items-center gap-2 text-xs font-semibold px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm shadow-emerald-700/20 transition cursor-pointer">
+            <i data-lucide="sheet" class="w-4 h-4"></i>
+            <span>Google Sheet ทะเบียน</span>
+          </button>
+
+          <!-- Quick Open Drive -->
+          <a href="https://drive.google.com/drive/u/0/folders/1bUQx-wtmx3iQFlV0Bknbwh45zPv35nR3" target="_blank" rel="noopener noreferrer" id="btn-open-drive-topbar" class="hidden md:flex items-center gap-2 text-xs font-semibold px-3.5 py-2 rounded-xl bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/20 border border-emerald-500/25 transition">
+            <i data-lucide="folder-up" class="w-4 h-4 text-emerald-600"></i>
+            <span>Google Drive</span>
+          </a>
+
+          <!-- Quick New Document Button -->
+          <button type="button" id="btn-quick-new-doc" class="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white shadow-md shadow-sky-600/30 transition cursor-pointer">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>สร้างเอกสารใหม่</span>
+          </button>
+
+          <!-- Lock Screen / Logout Button -->
+          <button type="button" id="topbar-btn-lock" class="p-2 rounded-xl bg-slate-100/80 hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200/80 transition cursor-pointer" title="ล็อกหน้าจอ / ออกจากระบบ (Lamp Screen)">
+            <i data-lucide="lock" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- =====================================================================
+           VIEW 1: LANDING PAGE (HOME)
+           ===================================================================== -->
+      <section id="view-landing" class="view-container p-6 md:p-8 max-w-7xl mx-auto w-full space-y-8">
+        
+        <!-- Hero Banner -->
+        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-sky-900 via-sky-800 to-slate-900 text-white p-8 md:p-10 shadow-lg">
+          <div class="relative z-10 max-w-2xl space-y-3">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/20 text-sky-200 border border-sky-400/30 backdrop-blur-sm">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-sky-300"></i>
+              ระบบบริหารจัดการเอกสารองค์กรครบวงจร (All-in-One)
+            </span>
+            <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight font-heading">
+              ออกบันทึกภายใน &amp; เอกสารทางการ<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-300 to-cyan-200">สะดวกรวดเร็วและเป็นมาตรฐานเดียวกัน</span>
+            </h2>
+            <p class="text-slate-300 text-sm md:text-base leading-relaxed pt-1">
+              ระบบรันเลขที่อัตโนมัติแยกตามบริษัท (ไทยวัฒนาพานิช, ล๊อกแมท, เหนือน้ำแอร์), บันทึกข้อความ, ประกาศ, หนังสือรับรองเงินเดือนและงาน พร้อมพรีวิวหน้า A4 แบบเรียลไทม์ และสำรองลง Google Drive ทันที
+            </p>
+            <div class="pt-4 flex flex-wrap gap-3">
+              <button onclick="window.app.navigateTo('editor')" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold text-sm shadow-lg shadow-sky-500/25 transition">
+                <i data-lucide="file-plus-2" class="w-4 h-4"></i>
+                เริ่มต้นสร้างเอกสาร
+              </button>
+              <button onclick="window.app.navigateTo('archive')" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-sm backdrop-blur-sm border border-white/20 transition">
+                <i data-lucide="search" class="w-4 h-4"></i>
+                ค้นหาเอกสารเดิม
+              </button>
+            </div>
+          </div>
+          <!-- Decorative Background Elements -->
+          <div class="absolute -right-10 -bottom-10 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+          <div class="absolute right-12 top-8 opacity-10 hidden lg:block pointer-events-none">
+            <i data-lucide="file-check-2" class="w-64 h-64 text-white"></i>
+          </div>
+        </div>
+
+        <!-- 4 Fast Action Cards by Document Type -->
+        <div>
+          <h3 class="text-lg font-bold text-slate-800 font-heading mb-4 flex items-center gap-2">
+            <i data-lucide="layers" class="w-5 h-5 text-sky-600"></i>
+            เลือกประเภทเอกสารที่ต้องการสร้าง
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- 1. บันทึกภายใน -->
+            <div onclick="window.app.resetEditorForm(); document.getElementById('form-doc-type').value='memo'; window.app.toggleDocTypeFields('memo'); window.app.navigateTo('editor');"
+                 class="glass-surface glass-surface-hover p-6 rounded-3xl border border-white/80 shadow-lg shadow-sky-950/5 cursor-pointer group flex flex-col justify-between">
+              <div>
+                <div class="w-13 h-13 rounded-2xl bg-sky-500/10 border border-sky-500/20 text-sky-600 flex items-center justify-center mb-4 group-hover:scale-110 transition shadow-xs">
+                  <i data-lucide="file-text" class="w-6 h-6"></i>
+                </div>
+                <h4 class="font-bold text-slate-800 group-hover:text-sky-600 text-base mb-1">บันทึกภายใน</h4>
+                <p class="text-xs text-slate-500 leading-relaxed">บันทึกข้อความทางการ ขออนุมัติ แจ้งเพื่อทราบ ภายในหน่วยงาน</p>
+              </div>
+              <div class="mt-4 pt-3 border-t border-slate-200/60 flex items-center justify-between text-xs text-sky-600 font-semibold">
+                <span>สร้างทันที</span>
+                <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition"></i>
+              </div>
+            </div>
+
+            <!-- 2. ประกาศ -->
+            <div onclick="window.app.resetEditorForm(); document.getElementById('form-doc-type').value='announcement'; window.app.toggleDocTypeFields('announcement'); window.app.navigateTo('editor');"
+                 class="glass-surface glass-surface-hover p-6 rounded-3xl border border-white/80 shadow-lg shadow-amber-950/5 cursor-pointer group flex flex-col justify-between">
+              <div>
+                <div class="w-13 h-13 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-600 flex items-center justify-center mb-4 group-hover:scale-110 transition shadow-xs">
+                  <i data-lucide="megaphone" class="w-6 h-6"></i>
+                </div>
+                <h4 class="font-bold text-slate-800 group-hover:text-amber-600 text-base mb-1">ประกาศบริษัท</h4>
+                <p class="text-xs text-slate-500 leading-relaxed">ประกาศระเบียบ นโยบาย วันหยุด และคำสั่งองค์กร</p>
+              </div>
+              <div class="mt-4 pt-3 border-t border-slate-200/60 flex items-center justify-between text-xs text-amber-600 font-semibold">
+                <span>สร้างทันที</span>
+                <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition"></i>
+              </div>
+            </div>
+
+            <!-- 3. หนังสือรับรองเงินเดือน -->
+            <div onclick="window.app.resetEditorForm(); document.getElementById('form-doc-type').value='salary_cert'; window.app.toggleDocTypeFields('salary_cert'); window.app.navigateTo('editor');"
+                 class="glass-surface glass-surface-hover p-6 rounded-3xl border border-white/80 shadow-lg shadow-emerald-950/5 cursor-pointer group flex flex-col justify-between">
+              <div>
+                <div class="w-13 h-13 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 flex items-center justify-center mb-4 group-hover:scale-110 transition shadow-xs">
+                  <i data-lucide="banknote" class="w-6 h-6"></i>
+                </div>
+                <h4 class="font-bold text-slate-800 group-hover:text-emerald-600 text-base mb-1">หนังสือรับรองเงินเดือน</h4>
+                <p class="text-xs text-slate-500 leading-relaxed">สำหรับยื่นขอสินเชื่อ ทำธุรกรรม พร้อมแปลงบาทถ้วนอัตโนมัติ</p>
+              </div>
+              <div class="mt-4 pt-3 border-t border-slate-200/60 flex items-center justify-between text-xs text-emerald-600 font-semibold">
+                <span>สร้างทันที</span>
+                <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition"></i>
+              </div>
+            </div>
+
+            <!-- 4. หนังสือรับรองการทำงาน -->
+            <div onclick="window.app.resetEditorForm(); document.getElementById('form-doc-type').value='work_cert'; window.app.toggleDocTypeFields('work_cert'); window.app.navigateTo('editor');"
+                 class="glass-surface glass-surface-hover p-6 rounded-3xl border border-white/80 shadow-lg shadow-purple-950/5 cursor-pointer group flex flex-col justify-between">
+              <div>
+                <div class="w-13 h-13 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-600 flex items-center justify-center mb-4 group-hover:scale-110 transition shadow-xs">
+                  <i data-lucide="award" class="w-6 h-6"></i>
+                </div>
+                <h4 class="font-bold text-slate-800 group-hover:text-purple-600 text-base mb-1">หนังสือรับรองการทำงาน</h4>
+                <p class="text-xs text-slate-500 leading-relaxed">รับรองประวัติการปฏิบัติงาน ตำแหน่ง และอายุงาน</p>
+              </div>
+              <div class="mt-4 pt-3 border-t border-slate-200/60 flex items-center justify-between text-xs text-purple-600 font-semibold">
+                <span>สร้างทันที</span>
+                <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Key Metrics Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="glass-surface glass-surface-hover p-5 rounded-2xl border border-white/80 shadow-xs">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">เอกสารทั้งหมด</span>
+            <div class="text-2xl md:text-3xl font-extrabold text-slate-800 mt-1 font-heading" id="stat-total-docs">0</div>
+          </div>
+          <div class="glass-surface glass-surface-hover p-5 rounded-2xl border border-white/80 shadow-xs">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">ออกเลขแล้ว</span>
+            <div class="text-2xl md:text-3xl font-extrabold text-emerald-600 mt-1 font-heading" id="stat-published-docs">0</div>
+          </div>
+          <div class="glass-surface glass-surface-hover p-5 rounded-2xl border border-white/80 shadow-xs">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">ฉบับร่าง</span>
+            <div class="text-2xl md:text-3xl font-extrabold text-amber-600 mt-1 font-heading" id="stat-draft-docs">0</div>
+          </div>
+          <div class="glass-surface glass-surface-hover p-5 rounded-2xl border border-white/80 shadow-xs">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">บริษัทในระบบ</span>
+            <div class="text-2xl md:text-3xl font-extrabold text-sky-600 mt-1 font-heading" id="stat-total-companies">3</div>
+          </div>
+        </div>
+
+        <!-- Recent Documents Table -->
+        <div class="glass-surface rounded-3xl border border-white/80 shadow-lg overflow-hidden">
+          <div class="p-5 border-b border-slate-200/60 flex items-center justify-between">
+            <h3 class="font-bold text-slate-800 font-heading text-base flex items-center gap-2">
+              <i data-lucide="clock" class="w-4 h-4 text-sky-600"></i>
+              เอกสารล่าสุดที่ดำเนินการ
+            </h3>
+            <button onclick="window.app.navigateTo('archive')" class="text-xs text-sky-600 hover:text-sky-700 font-semibold cursor-pointer">
+              ดูทั้งหมด &rarr;
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-medium border-b border-slate-100">
+                <tr>
+                  <th class="px-4 py-3">เลขที่เอกสาร</th>
+                  <th class="px-4 py-3">เรื่อง</th>
+                  <th class="px-4 py-3">บริษัท</th>
+                  <th class="px-4 py-3">วันที่</th>
+                  <th class="px-4 py-3 text-right">การจัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="landing-recent-table-body" class="divide-y divide-slate-100">
+                <!-- Injected by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- =====================================================================
+           VIEW 2: DOCUMENT CREATOR (SPLIT SCREEN: FORM + LIVE A4 PREVIEW)
+           ===================================================================== -->
+      <section id="view-editor" class="view-container hidden flex-1 flex flex-col xl:flex-row overflow-hidden bg-slate-100/80">
+        
+        <!-- LEFT COLUMN: FORM CONTROLS (Glassmorphic) -->
+        <div id="editor-form-panel" class="form-panel-transition w-full lg:w-[490px] xl:w-[510px] glass-surface border-r border-slate-200/80 flex flex-col shrink-0 h-auto xl:h-[calc(100vh-64px)] overflow-y-auto relative">
+          
+          <!-- Form Header & Status -->
+          <div class="p-4 border-b border-slate-200/80 bg-white/75 sticky top-0 z-10 backdrop-blur-md flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <h2 class="text-base font-bold text-slate-800 font-heading">กรอกข้อมูลเอกสาร</h2>
+            </div>
+            <div class="flex items-center gap-2">
+              <div id="editor-next-number-badge">
+                <!-- Injected by JS -->
+              </div>
+              <!-- Button to Collapse Form and give 100% width to preview -->
+              <button type="button" id="btn-collapse-form-panel" class="p-2 rounded-xl bg-slate-100/90 hover:bg-slate-200 text-slate-700 hover:text-slate-900 transition flex items-center gap-1.5 text-xs font-semibold cursor-pointer border border-slate-200" title="ย่อฟอร์มเพื่อขยายพรีวิวเอกสารเต็มจอ">
+                <i data-lucide="chevrons-left" class="w-4 h-4"></i>
+                <span class="hidden sm:inline">ย่อฟอร์ม</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Visual 3-Step Process Header Banner -->
+          <div class="m-4 mb-0 p-3.5 bg-gradient-to-r from-slate-900 via-sky-950 to-slate-900 text-white rounded-2xl shadow-md border border-white/10">
+            <div class="flex items-center justify-between mb-2 pb-2 border-b border-white/10">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="text-xs font-bold text-sky-200">ลำดับขั้นตอนการทำงาน (Workflow)</span>
+              </div>
+              <div id="workflow-status-badge" class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30">
+                สเต็ป 1: ยังไม่ออกเลขที่
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-1.5 text-center text-[10px]">
+              <div id="step-badge-1" class="step-badge p-1.5 rounded-lg bg-sky-500/20 border border-sky-400/40 font-semibold text-sky-200">
+                1. ออกเลขที่ก่อน
+              </div>
+              <div id="step-badge-2" class="step-badge p-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-400">
+                2. พิมพ์/แนบไฟล์
+              </div>
+              <div id="step-badge-3" class="step-badge p-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-400">
+                3. บันทึกยืนยัน
+              </div>
+            </div>
+
+            <!-- Primary Step 1 Action Button -->
+            <div class="mt-2.5 pt-2 border-t border-white/10 space-y-1.5">
+              <button type="button" id="btn-issue-number-first" class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-md transition cursor-pointer">
+                <i data-lucide="tag" class="w-4 h-4"></i>
+                <span id="btn-issue-number-first-text">🏷️ ออกเลขที่เอกสารล่วงหน้า (จองเลขทางการทันที)</span>
+              </button>
+
+              <button type="button" id="btn-custom-doc-number" class="w-full py-2 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 border border-white/15 text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer" title="กำหนดเลขที่เอกสารเอง หรือเริ่มใหม่ที่ 001">
+                <i data-lucide="edit-3" class="w-3.5 h-3.5 text-sky-400"></i>
+                <span>✏️ กำหนดเลขที่เอง / เริ่ม 001 / ซ่อมลำดับ</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Form Fields Container -->
+          <form id="doc-editor-form" class="p-5 space-y-4" onsubmit="return false;">
+            
+            <!-- Company & Doc Type Selectors -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1.5">เลือกบริษัทฯ</label>
+                <select id="form-company-select" class="w-full text-sm glass-input rounded-xl p-2.5 focus:ring-2 focus:ring-sky-500 focus:outline-none font-medium text-slate-800">
+                  <!-- Populated by JS -->
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1.5">ประเภทเอกสาร</label>
+                <select id="form-doc-type" class="w-full text-sm glass-input rounded-xl p-2.5 focus:ring-2 focus:ring-sky-500 focus:outline-none font-bold text-sky-900">
+                  <option value="memo">บันทึกภายใน</option>
+                  <option value="announcement">ประกาศ</option>
+                  <option value="salary_cert">หนังสือรับรองเงินเดือน</option>
+                  <option value="work_cert">หนังสือรับรองการทำงาน</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Custom Document Header Title Selector (แก้คำว่าบันทึกภายใน / บันทึกข้อความ) -->
+            <div id="memo-header-title-container" class="space-y-1.5 bg-sky-50/60 p-3.5 rounded-2xl border border-sky-100">
+              <div class="flex items-center justify-between">
+                <label class="block text-xs font-semibold text-slate-700">คำหัวเอกสาร (Title ที่แสดงบนกระดาษ)</label>
+                <span class="text-[10px] text-sky-700 bg-sky-100/90 px-2 py-0.5 rounded-md font-semibold">ปรับเปลี่ยนได้</span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <select id="form-header-title-select" class="w-full text-xs glass-input rounded-xl p-2.5 focus:ring-2 focus:ring-sky-500 focus:outline-none font-bold text-slate-800">
+                  <option value="บันทึกภายใน">บันทึกภายใน (ตามที่เลือก)</option>
+                  <option value="บันทึกข้อความ">บันทึกข้อความ</option>
+                  <option value="__custom__">+ พิมพ์คำหัวเอกสารเอง...</option>
+                </select>
+                <input type="text" id="form-header-title-custom" placeholder="หรือพิมพ์คำหัวเอกสารเอง..." class="w-full text-xs glass-input rounded-xl p-2.5 focus:ring-2 focus:ring-sky-500 focus:outline-none font-bold text-slate-800">
+              </div>
+            </div>
+
+            <!-- Company Branding, Logo & Tax ID Controls (แก้ไขได้ทันที) -->
+            <div class="p-3.5 bg-sky-50/60 rounded-xl border border-sky-200/80 space-y-3">
+              <div class="flex items-center justify-between">
+                <h4 class="text-xs font-bold text-sky-950 uppercase tracking-wider flex items-center gap-1.5">
+                  <i data-lucide="building-2" class="w-4 h-4 text-sky-600"></i>
+                  หัวเอกสาร, โลโก้ &amp; ข้อมูลหน่วยงาน
+                </h4>
+                <span class="text-[10px] text-sky-700 bg-sky-100 px-2 py-0.5 rounded font-semibold">ปรับแต่งได้</span>
+              </div>
+
+              <!-- Logo Preview & Custom Upload -->
+              <div class="flex items-center gap-3 bg-white p-2.5 rounded-lg border border-slate-200">
+                <div class="w-16 h-12 bg-slate-50 rounded border border-slate-200 flex items-center justify-center p-1 shrink-0 overflow-hidden">
+                  <img id="form-logo-preview" src="assets/images/twp_logo.png" alt="Logo Preview" class="max-h-full max-w-full object-contain">
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2">
+                    <label class="text-xs bg-sky-600 hover:bg-sky-700 text-white px-2.5 py-1 rounded-md font-semibold cursor-pointer shadow-xs transition inline-flex items-center gap-1">
+                      <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                      <span>เปลี่ยนโลโก้</span>
+                      <input type="file" id="form-logo-file-input" accept="image/*" class="hidden">
+                    </label>
+                    <button type="button" id="btn-reset-company-logo" class="text-xs text-slate-500 hover:text-slate-800 underline">
+                      ใช้โลโก้เดิม
+                    </button>
+                  </div>
+                  <p class="text-[10px] text-slate-400 mt-0.5">เปลี่ยนรูปโลโก้หัวเอกสารได้ทันที (PNG, SVG, JPG)</p>
+                </div>
+              </div>
+
+              <!-- Company Name & Tax ID -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">ชื่อหัวเอกสาร / บริษัท</label>
+                  <input type="text" id="form-company-name-input" placeholder="ชื่อบริษัท..." class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none font-medium text-slate-800">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">เลขประจำตัวผู้เสียภาษี (แสดงที่ Footer)</label>
+                  <input type="text" id="form-company-taxid-input" placeholder="เลขผู้เสียภาษี 13 หลัก..." class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none font-mono text-slate-800">
+                </div>
+              </div>
+
+              <!-- Tel & Address (to show in footer) -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">เบอร์โทรศัพท์ (แสดงที่ Footer)</label>
+                  <input type="text" id="form-company-tel-input" placeholder="เบอร์โทรศัพท์..." class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">ที่อยู่ (แสดงที่ Footer)</label>
+                  <input type="text" id="form-company-address-input" placeholder="ที่อยู่บริษัท..." class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                </div>
+              </div>
+
+              <!-- Save Company Defaults Button (ใช้ได้ตลอดไปจนกว่าจะแก้ไข) -->
+              <div class="pt-2.5 border-t border-sky-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <span class="text-[11px] text-slate-500">บันทึกโลโก้และข้อมูลนี้ใช้ตลอดไป:</span>
+                <button type="button" id="btn-save-company-defaults" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg font-semibold flex items-center justify-center gap-1.5 shadow-xs transition cursor-pointer" title="บันทึกข้อมูลและโลโก้เป็นค่าเริ่มต้นของบริษัทเพื่อใช้ตลอดไป">
+                  <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                  <span>บันทึกเป็นค่าเริ่มต้นของบริษัทนี้</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Date & Department -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1.5">วันที่ออกเอกสาร</label>
+                <input type="date" id="form-doc-date" class="w-full text-sm bg-slate-50 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1.5">หน่วยงาน / ส่วนงาน (แสดงที่ Footer)</label>
+                <input type="text" id="form-department-input" placeholder="เช่น ฝ่ายบริหาร, ฝ่ายบัญชี" class="w-full text-sm bg-slate-50 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+              </div>
+            </div>
+
+            <!-- Recipient ("เรียน") Section -->
+            <div id="memo-recipient-fields" class="space-y-2">
+              <label class="block text-xs font-semibold text-slate-700">เรียน (ถึงใคร)</label>
+              <select id="form-recipient-select" class="w-full text-sm bg-slate-50 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                <!-- Populated by JS -->
+              </select>
+              <div id="form-recipient-custom-group" class="hidden">
+                <input type="text" id="form-recipient-custom" placeholder="ระบุชื่อหรือตำแหน่งผู้รับ..." class="w-full text-sm bg-amber-50/50 border border-amber-300 rounded-lg p-2 focus:ring-2 focus:ring-amber-500 focus:outline-none">
+              </div>
+            </div>
+
+            <!-- Subject ("เรื่อง") with Autocomplete & Quick Chips -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <label class="block text-xs font-semibold text-slate-700">เรื่อง (หัวข้อเอกสาร)</label>
+                <span class="text-[11px] text-slate-400">มีระบบแนะนำเรื่องที่เคยใช้</span>
+              </div>
+              <input type="text" id="form-subject-input" list="subjects-datalist" placeholder="พิมพ์ชื่อเรื่อง..." class="w-full text-sm bg-slate-50 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-sky-500 focus:outline-none font-medium">
+              <datalist id="subjects-datalist"></datalist>
+
+              <!-- Quick Subject Chips -->
+              <div class="pt-1">
+                <p class="text-[11px] text-slate-500 mb-1 font-medium">เรื่องที่ใช้บ่อย (คลิกเพื่อเลือกทันที):</p>
+                <div id="subject-chips-container" class="flex flex-wrap gap-1.5">
+                  <!-- Injected by JS -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Certificate Specific Fields (Hidden unless Salary/Work cert is selected) -->
+            <div id="certificate-specific-fields" class="hidden p-4 bg-emerald-50/50 rounded-xl border border-emerald-200 space-y-3">
+              <h4 class="text-xs font-bold text-emerald-800 uppercase tracking-wider flex items-center gap-1.5">
+                <i data-lucide="badge-check" class="w-4 h-4"></i>
+                ข้อมูลเฉพาะหนังสือรับรอง
+              </h4>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-medium text-slate-700 mb-1">ชื่อ-สกุล พนักงาน</label>
+                  <input type="text" id="form-emp-name" placeholder="นาย/นาง/นางสาว..." class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-slate-700 mb-1">เลขบัตรประชาชน</label>
+                  <input type="text" id="form-emp-idcard" placeholder="x-xxxx-xxxxx-xx-x" class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-medium text-slate-700 mb-1">ตำแหน่งงาน</label>
+                  <input type="text" id="form-emp-position" placeholder="พนักงานการเงิน..." class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-slate-700 mb-1">วันที่เริ่มงาน</label>
+                  <input type="date" id="form-emp-start-date" class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                </div>
+              </div>
+
+              <!-- Salary Only -->
+              <div id="salary-only-fields" class="space-y-3 pt-1 border-t border-emerald-200/60">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">เงินเดือน (บาท)</label>
+                    <input type="number" id="form-emp-salary" value="35000" class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">ตัวหนังสือ (แปลงให้อัตโนมัติ)</label>
+                    <input type="text" id="form-emp-salary-text" readonly class="w-full text-xs bg-slate-100 border border-slate-300 rounded-lg p-2 text-slate-600">
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-medium text-slate-700 mb-1">วัตถุประสงค์ในการออกหนังสือ</label>
+                <input type="text" id="form-emp-purpose" placeholder="เพื่อใช้ประกอบการยื่นขอสินเชื่อที่อยู่อาศัย" class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              </div>
+            </div>
+
+            <!-- Content Area (Rich Text) -->
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-slate-700">เนื้อหาเอกสาร (ไม่จำกัดจำนวนคำ)</label>
+              <!-- Simple Formatting Toolbar -->
+              <div class="flex items-center gap-1 p-1.5 bg-slate-100 rounded-t-lg border border-slate-300 border-b-0">
+                <button type="button" data-cmd="bold" class="editor-tool-btn p-1.5 rounded hover:bg-white text-slate-700 text-xs font-bold" title="ตัวหนา"><b>B</b></button>
+                <button type="button" data-cmd="italic" class="editor-tool-btn p-1.5 rounded hover:bg-white text-slate-700 text-xs italic" title="ตัวเอียง"><i>I</i></button>
+                <button type="button" data-cmd="underline" class="editor-tool-btn p-1.5 rounded hover:bg-white text-slate-700 text-xs underline" title="ขีดเส้นใต้"><u>U</u></button>
+                <span class="w-px h-4 bg-slate-300 mx-1"></span>
+                <button type="button" data-cmd="insertUnorderedList" class="editor-tool-btn p-1.5 rounded hover:bg-white text-slate-700 text-xs" title="รายการจุด"><i data-lucide="list" class="w-3.5 h-3.5"></i></button>
+                <button type="button" data-cmd="insertOrderedList" class="editor-tool-btn p-1.5 rounded hover:bg-white text-slate-700 text-xs" title="รายการตัวเลข"><i data-lucide="list-ordered" class="w-3.5 h-3.5"></i></button>
+                <span class="w-px h-4 bg-slate-300 mx-1"></span>
+                <button type="button" data-cmd="justifyLeft" class="editor-tool-btn p-1.5 rounded hover:bg-white text-slate-700 text-xs" title="ชิดซ้าย"><i data-lucide="align-left" class="w-3.5 h-3.5"></i></button>
+                <button type="button" data-cmd="justifyFull" class="editor-tool-btn p-1.5 rounded hover:bg-white text-slate-700 text-xs" title="กระจายเต็มบรรทัด"><i data-lucide="align-justify" class="w-3.5 h-3.5"></i></button>
+              </div>
+              <div id="rich-content-editor" contenteditable="true" class="min-h-[160px] max-h-[300px] overflow-y-auto p-3 text-sm bg-white border border-slate-300 rounded-b-lg focus:outline-none focus:ring-2 focus:ring-sky-500 leading-relaxed">
+                <!-- Rich text editable -->
+              </div>
+            </div>
+
+            <!-- Closing Phrase ("ประโยคปิดท้าย") -->
+            <div class="space-y-2">
+              <label class="block text-xs font-semibold text-slate-700">ประโยคปิดท้าย</label>
+              <select id="form-closing-select" class="w-full text-sm bg-slate-50 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                <!-- Populated by JS -->
+              </select>
+              <div id="form-closing-custom-group" class="hidden">
+                <input type="text" id="form-closing-custom" placeholder="ระบุประโยคปิดท้ายเอง..." class="w-full text-sm bg-amber-50/50 border border-amber-300 rounded-lg p-2 focus:ring-2 focus:ring-amber-500 focus:outline-none">
+              </div>
+            </div>
+
+            <!-- Signer Name, Position & Signature Pad -->
+            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-4">
+              <div class="flex items-center justify-between">
+                <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                  <i data-lucide="pen-tool" class="w-4 h-4 text-sky-600"></i>
+                  การลงนามและผู้รับผิดชอบ
+                </h4>
+                <div class="space-x-1">
+                  <button type="button" id="btn-signature-pad" class="text-xs bg-sky-600 hover:bg-sky-700 text-white px-2.5 py-1 rounded-lg font-medium shadow-xs">
+                    วาด/อัปโหลดลายเซ็น
+                  </button>
+                  <button type="button" id="btn-clear-sig" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-1 rounded-lg">
+                    ลบลายเซ็น
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-medium text-slate-700 mb-1">ชื่อ-สกุล ผู้ลงนาม</label>
+                <input type="text" id="form-signer-name-input" placeholder="พิมพ์ชื่อ-สกุล เช่น นายสมชาย มีสุข" class="w-full text-sm bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+              </div>
+
+              <div class="space-y-1.5">
+                <label class="block text-xs font-medium text-slate-700">ตำแหน่งผู้ลงนาม</label>
+                <select id="form-signer-position-select" class="w-full text-sm bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                  <!-- Populated by JS -->
+                </select>
+                <div id="form-signer-position-custom-group" class="hidden">
+                  <input type="text" id="form-signer-position-custom" placeholder="ระบุตำแหน่งใหม่..." class="w-full text-sm bg-amber-50 border border-amber-300 rounded-lg p-2 focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                </div>
+              </div>
+            </div>
+
+            <!-- File Attachments Section (ระบบแนบไฟล์พร้อมบีบอัดรูปภาพอัตโนมัติ) -->
+            <div class="p-4 bg-sky-50/70 rounded-2xl border border-sky-200/90 space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <div class="p-1.5 bg-sky-500/15 text-sky-700 rounded-lg">
+                    <i data-lucide="paperclip" class="w-4 h-4"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-xs font-bold text-slate-800">เอกสารแนบ / สิ่งที่ส่งมาด้วย (Attachments)</h4>
+                    <p class="text-[10px] text-slate-500">บีบอัดรูปภาพอัตโนมัติผ่าน Canvas เพื่อประหยัดพื้นที่จัดเก็บ</p>
+                  </div>
+                </div>
+                <span id="attachments-count-badge" class="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-700">0 ไฟล์</span>
+              </div>
+
+              <!-- Upload Drag & Drop Trigger -->
+              <label for="form-file-attachments" class="border-2 border-dashed border-sky-300 hover:border-sky-500 bg-white/80 hover:bg-sky-50/60 transition-all rounded-xl p-3.5 flex flex-col items-center justify-center cursor-pointer group text-center shadow-xs">
+                <div class="w-9 h-9 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center group-hover:scale-110 transition mb-1.5 shadow-inner">
+                  <i data-lucide="upload-cloud" class="w-5 h-5"></i>
+                </div>
+                <span class="text-xs font-bold text-slate-700 group-hover:text-sky-700">คลิกเพื่อเลือกไฟล์ หรือ ลากไฟล์มาวางที่นี่</span>
+                <span class="text-[10px] text-slate-400 mt-0.5">รองรับ รูปภาพ (JPG, PNG), เอกสาร PDF, Word, Excel (รูปภาพจะถูกบีบอัดอัตโนมัติ)</span>
+                <input type="file" id="form-file-attachments" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt" class="hidden">
+              </label>
+
+              <!-- Attachment List Container -->
+              <div id="attachments-list-container" class="space-y-2 hidden">
+                <!-- Populated dynamically by JS -->
+              </div>
+            </div>
+
+            <!-- Bottom Operation Action Buttons (Step 3: Confirm & Save) -->
+            <div class="pt-4 border-t border-slate-200 space-y-2.5">
+              <!-- Step 3: Main Finalize & Confirm Button -->
+              <button type="button" id="btn-confirm-save-doc" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-sky-700 hover:from-emerald-500 hover:to-sky-600 text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-lg transition cursor-pointer">
+                <i data-lucide="check-check" class="w-5 h-5"></i>
+                <span id="btn-confirm-save-doc-text">💾 3. บันทึกยืนยันเนื้อหาเอกสาร (Finalize &amp; Confirm)</span>
+              </button>
+
+              <div class="grid grid-cols-2 gap-2">
+                <button type="button" id="btn-save-draft" class="w-full py-2.5 px-3 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer">
+                  <i data-lucide="file-edit" class="w-4 h-4"></i>
+                  บันทึกฉบับร่าง
+                </button>
+                <button type="button" id="btn-delete-doc" class="w-full py-2.5 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer">
+                  <i data-lucide="trash-2" class="w-4 h-4 text-rose-600"></i>
+                  <span id="btn-delete-doc-text">ล้างข้อมูล / ยกเลิก</span>
+                </button>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <button type="button" id="btn-export-pdf" class="w-full py-2.5 px-3 rounded-xl bg-sky-700 hover:bg-sky-800 text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-xs transition cursor-pointer">
+                  <i data-lucide="printer" class="w-4 h-4"></i>
+                  พิมพ์ / บันทึก PDF
+                </button>
+                <button type="button" id="btn-export-word" class="w-full py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-xs transition cursor-pointer">
+                  <i data-lucide="file-down" class="w-4 h-4"></i>
+                  ดาวน์โหลด Word (.doc)
+                </button>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <button type="button" id="btn-sync-drive" class="w-full py-2 px-3 rounded-xl bg-teal-50 border border-teal-200 hover:bg-teal-100 text-teal-800 text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer">
+                  <i data-lucide="cloud-upload" class="w-4 h-4 text-teal-600"></i>
+                  ซิงค์เข้า Sheet &amp; Drive
+                </button>
+                <button type="button" id="btn-send-email" class="w-full py-2 px-3 rounded-xl bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 text-indigo-800 text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer">
+                  <i data-lucide="mail" class="w-4 h-4 text-indigo-600"></i>
+                  ส่ง Email
+                </button>
+              </div>
+            </div>
+
+          </form>
+
+        </div>
+
+        <!-- RIGHT COLUMN: REAL-TIME A4 LIVE PREVIEW -->
+        <div class="flex-1 flex flex-col min-w-0 bg-slate-300 overflow-hidden">
+          
+          <!-- Preview Toolbar with Expand/Collapse & Zoom Controls (Glass Dark) -->
+          <div class="h-14 glass-card-dark text-white px-4 flex items-center justify-between shadow-md shrink-0 border-b border-white/10">
+            <div class="flex items-center gap-2.5">
+              <!-- Re-open Form Panel Button (Visible when form is collapsed) -->
+              <button type="button" id="btn-expand-form-panel" class="hidden px-3 py-1.5 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white text-xs font-semibold flex items-center gap-1.5 shadow-md transition cursor-pointer" title="แสดงฟอร์มสำหรับพิมพ์แก้ไขข้อมูล">
+                <i data-lucide="chevrons-right" class="w-4 h-4"></i>
+                <span>เปิดฟอร์มแก้ไข</span>
+              </button>
+
+              <div class="flex items-center gap-2 text-xs font-medium">
+                <i data-lucide="eye" class="w-4 h-4 text-sky-400"></i>
+                <span class="hidden sm:inline font-semibold">ตัวอย่างหน้ากระดาษ A4 เสมือนจริง</span>
+                <span id="preview-mode-badge" class="text-[11px] text-sky-300 font-semibold bg-sky-500/20 px-2.5 py-0.5 rounded-lg border border-sky-400/30">พรีวิวสด</span>
+              </div>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <!-- Toggle Full Preview vs Split View Button -->
+              <button type="button" id="btn-toggle-fullscreen-preview" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-100 border border-white/15 text-xs font-semibold flex items-center gap-1.5 shadow-xs transition cursor-pointer backdrop-blur-sm" title="สลับโหมดพรีวิวเต็มหน้าจอ / สองฝั่ง">
+                <i data-lucide="maximize-2" class="w-3.5 h-3.5" id="btn-toggle-preview-icon"></i>
+                <span id="btn-toggle-preview-text">ขยายพรีวิวเต็มจอ</span>
+              </button>
+
+              <span class="w-px h-5 bg-white/15 mx-0.5"></span>
+
+              <button type="button" id="btn-zoom-fit" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs transition cursor-pointer" title="ปรับขนาดให้พอดีหน้าจอทันที">
+                <i data-lucide="maximize" class="w-3.5 h-3.5"></i>
+                <span>พอดีหน้าจอ</span>
+              </button>
+              <button type="button" id="btn-zoom-out" class="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs transition cursor-pointer border border-white/10" title="ย่อ">-</button>
+              <span id="preview-scale-label" class="text-xs text-slate-300 font-mono px-1.5 min-w-[55px] text-center">พอดีจอ</span>
+              <button type="button" id="btn-zoom-in" class="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs transition cursor-pointer border border-white/10" title="ขยาย">+</button>
+              <button type="button" id="btn-zoom-100" class="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs text-white transition cursor-pointer border border-white/10" title="ขนาดจริง 100%">100%</button>
+            </div>
+          </div>
+
+          <!-- A4 Sheet Container with Scaling Wrapper -->
+          <div class="a4-preview-container flex-1">
+            <div id="a4-sheet-wrapper" class="a4-sheet-wrapper">
+              <div id="a4-print-target" class="a4-sheet">
+                <!-- Dynamically rendered by updateLivePreview() -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- =====================================================================
+           VIEW 3: ARCHIVE & SEARCH
+           ===================================================================== -->
+      <section id="view-archive" class="view-container hidden p-6 md:p-8 max-w-7xl mx-auto w-full space-y-6">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-bold text-slate-800 font-heading">คลังเอกสาร &amp; การค้นหา</h2>
+            <p class="text-xs text-slate-500">รวมเอกสารทั้งหมดในระบบ สามารถค้นหา กรอง และดาวน์โหลดซ้ำได้</p>
+          </div>
+          <div class="flex items-center gap-2.5">
+            <button type="button" id="btn-open-sheet-archive" class="px-3.5 py-2 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100 text-xs font-semibold flex items-center gap-2 shadow-xs transition cursor-pointer">
+              <i data-lucide="sheet" class="w-4 h-4 text-emerald-600"></i>
+              <span>เปิดดู Google Sheet ทะเบียนคุม</span>
+            </button>
+            <span id="archive-total-count" class="text-xs font-semibold px-3 py-1 bg-slate-200 text-slate-700 rounded-full w-fit">
+              0 รายการ
+            </span>
+          </div>
+        </div>
+
+        <!-- Company Filter Quick Tabs (แยกดูเฉพาะบริษัทตนเอง หรือ รวมทุกบริษัท) -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-1" id="archive-company-tabs">
+          <!-- Injected dynamically by JS -->
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="glass-surface p-5 rounded-3xl border border-white/80 shadow-md grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">ค้นหาคำสำคัญ</label>
+            <div class="relative">
+              <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <input type="text" id="archive-search-input" placeholder="เลขที่, ชื่อเรื่อง, ผู้ลงนาม..." class="w-full text-xs pl-9 pr-3 py-2.5 glass-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">บริษัท</label>
+            <select id="archive-filter-company" class="w-full text-xs py-2.5 px-3 glass-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+              <option value="all">ทุกบริษัท</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">ประเภทเอกสาร</label>
+            <select id="archive-filter-type" class="w-full text-xs py-2.5 px-3 glass-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+              <option value="all">ทุกประเภท</option>
+              <option value="memo">บันทึกภายใน</option>
+              <option value="announcement">ประกาศ</option>
+              <option value="salary_cert">หนังสือรับรองเงินเดือน</option>
+              <option value="work_cert">หนังสือรับรองการทำงาน</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">สถานะ</label>
+            <select id="archive-filter-status" class="w-full text-xs py-2.5 px-3 glass-input rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500">
+              <option value="all">ทุกสถานะ</option>
+              <option value="published">ออกเลขแล้ว (Published)</option>
+              <option value="draft">ฉบับร่าง (Draft)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Documents Table -->
+        <div class="glass-surface rounded-3xl border border-white/80 shadow-lg overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-slate-50/70 text-slate-600 text-xs uppercase font-semibold border-b border-slate-200/60">
+                <tr>
+                  <th class="px-4 py-3.5">เลขที่เอกสาร</th>
+                  <th class="px-4 py-3.5">ประเภท</th>
+                  <th class="px-4 py-3.5">เรื่อง / บริษัท</th>
+                  <th class="px-4 py-3.5">วันที่</th>
+                  <th class="px-4 py-3.5">ผู้ลงนาม</th>
+                  <th class="px-4 py-3.5">สถานะ</th>
+                  <th class="px-4 py-3.5 text-right">การจัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="archive-table-body" class="divide-y divide-slate-100">
+                <!-- Injected by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- =====================================================================
+           VIEW 4: RUNNING LOGS & AUDIT TRAIL
+           ===================================================================== -->
+      <section id="view-running-logs" class="view-container hidden p-6 md:p-8 max-w-7xl mx-auto w-full space-y-6">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-bold text-slate-800 font-heading">สมุดทะเบียนคุม Running No. (Audit Trail)</h2>
+            <p class="text-xs text-slate-500">บันทึกประวัติการออกเลขที่เอกสาร แสดงเลขก่อนหน้า-ปัจจุบัน-ถัดไป ป้องกันการข้ามเลข</p>
+          </div>
+          <div class="flex items-center gap-2.5 flex-wrap self-start sm:self-auto">
+            <button type="button" id="btn-sync-heal-sequences" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition cursor-pointer" title="ตรวจสอบและจัดลำดับเลขใหม่ ให้สอดคล้องกับเอกสารที่มีอยู่">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+              <span>🔄 ตรวจสอบและซ่อมลำดับเลขว่าง</span>
+            </button>
+            <button type="button" id="btn-open-sheet-logs" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-2 shadow-sm transition cursor-pointer">
+              <i data-lucide="sheet" class="w-4 h-4"></i>
+              <span>เปิดดู Google Sheet Memo List</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Counters Summary Cards -->
+        <div id="running-counters-cards" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Injected by JS -->
+        </div>
+
+        <!-- Company Filter Quick Tabs (แยกดูเฉพาะบริษัทตนเอง หรือ รวมทุกบริษัท) -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-1" id="running-logs-company-tabs">
+          <!-- Injected dynamically by JS -->
+        </div>
+
+        <!-- Running Logs Table -->
+        <div class="glass-surface rounded-3xl border border-white/80 shadow-lg overflow-hidden">
+          <div class="p-4 border-b border-slate-200/60 flex items-center justify-between">
+            <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              <i data-lucide="history" class="w-4 h-4 text-sky-600"></i>
+              ประวัติการออกเลขที่ล่าสุด
+            </h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-slate-50/70 text-slate-600 text-xs uppercase font-semibold border-b border-slate-200/60">
+                <tr>
+                  <th class="px-4 py-3.5">เลขที่ออกจริง</th>
+                  <th class="px-4 py-3.5">เลขก่อนหน้า</th>
+                  <th class="px-4 py-3.5">เลขถัดไป</th>
+                  <th class="px-4 py-3.5">เรื่อง / บริษัท</th>
+                  <th class="px-4 py-3.5">ผู้ดำเนินการ</th>
+                  <th class="px-4 py-3.5">วันเวลาที่ออก</th>
+                  <th class="px-4 py-3.5 text-center">สถานะ</th>
+                  <th class="px-4 py-3.5 text-right">การจัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="running-logs-table-body" class="divide-y divide-slate-100">
+                <!-- Injected by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- =====================================================================
+           VIEW 5: EXECUTIVE DASHBOARD
+           ===================================================================== -->
+      <section id="view-dashboard" class="view-container hidden p-6 md:p-8 max-w-7xl mx-auto w-full space-y-6">
+        
+        <div>
+          <h2 class="text-2xl font-bold text-slate-800 font-heading">แดชบอร์ดสรุปผู้บริหาร (Executive Overview)</h2>
+          <p class="text-xs text-slate-500">สถิติการออกเอกสารรายเดือน/ปี การกระจายตัวตามบริษัท และประเภทเอกสาร</p>
+        </div>
+
+        <!-- KPI Metrics -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="glass-surface glass-surface-hover p-5 rounded-3xl border border-white/80 shadow-xs">
+            <span class="text-xs font-semibold text-slate-400 uppercase">เอกสารรวมทั้งหมด</span>
+            <div id="dash-kpi-total" class="text-3xl font-extrabold text-slate-900 mt-1 font-heading">0</div>
+          </div>
+          <div class="glass-surface glass-surface-hover p-5 rounded-3xl border border-white/80 shadow-xs">
+            <span class="text-xs font-semibold text-slate-400 uppercase">อนุมัติออกเลขแล้ว</span>
+            <div id="dash-kpi-published" class="text-3xl font-extrabold text-emerald-600 mt-1 font-heading">0</div>
+          </div>
+          <div class="glass-surface glass-surface-hover p-5 rounded-3xl border border-white/80 shadow-xs">
+            <span class="text-xs font-semibold text-slate-400 uppercase">อยู่ระหว่างร่าง</span>
+            <div id="dash-kpi-draft" class="text-3xl font-extrabold text-amber-500 mt-1 font-heading">0</div>
+          </div>
+          <div class="glass-surface glass-surface-hover p-5 rounded-3xl border border-white/80 shadow-xs">
+            <span class="text-xs font-semibold text-slate-400 uppercase">นิติบุคคลในระบบ</span>
+            <div id="dash-kpi-companies" class="text-3xl font-extrabold text-sky-600 mt-1 font-heading">3</div>
+          </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Chart 1: Company Distribution -->
+          <div class="glass-surface p-6 rounded-3xl border border-white/80 shadow-lg">
+            <h3 class="font-bold text-slate-800 text-sm mb-4 flex items-center gap-2">
+              <i data-lucide="bar-chart-2" class="w-4 h-4 text-sky-600"></i>
+              สัดส่วนเอกสารแยกตามบริษัท
+            </h3>
+            <div class="h-64 relative">
+              <canvas id="chart-company"></canvas>
+            </div>
+          </div>
+
+          <!-- Chart 2: Doc Types Doughnut -->
+          <div class="glass-surface p-6 rounded-3xl border border-white/80 shadow-lg">
+            <h3 class="font-bold text-slate-800 text-sm mb-4 flex items-center gap-2">
+              <i data-lucide="pie-chart" class="w-4 h-4 text-sky-600"></i>
+              สัดส่วนแยกตามประเภทเอกสาร
+            </h3>
+            <div class="h-64 relative">
+              <canvas id="chart-types"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart 3: Monthly Trend -->
+        <div class="glass-surface p-6 rounded-3xl border border-white/80 shadow-lg">
+          <h3 class="font-bold text-slate-800 text-sm mb-4 flex items-center gap-2">
+            <i data-lucide="trending-up" class="w-4 h-4 text-sky-600"></i>
+            แนวโน้มการออกเอกสารรายเดือน (ประจำปีปัจจุบัน)
+          </h3>
+          <div class="h-72 relative">
+            <canvas id="chart-monthly"></canvas>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- =======================================================================
+           VIEW 6: USER MANUAL & SYSTEM GUIDE (คู่มือการใช้งานระบบ)
+           ======================================================================= -->
+      <section id="view-manual" class="view-container hidden p-6 md:p-8 max-w-7xl mx-auto w-full space-y-8">
+        
+        <!-- Header Hero Banner -->
+        <div class="glass-card-dark p-6 sm:p-8 rounded-3xl text-white shadow-2xl relative overflow-hidden border border-white/10">
+          <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="space-y-2 max-w-2xl">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/30 text-xs font-semibold backdrop-blur-md">
+                <i data-lucide="book-marked" class="w-3.5 h-3.5"></i>
+                <span>คู่มือการใช้งานระบบอย่างเป็นทางการ • ฉบับปรับปรุง 2026</span>
+              </div>
+              <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight font-heading">
+                คู่มือการใช้งานระบบ <span class="bg-gradient-to-r from-sky-400 via-cyan-300 to-emerald-400 bg-clip-text text-transparent">Memo All In One</span>
+              </h1>
+              <p class="text-sm text-slate-300 leading-relaxed font-light">
+                ระบบจัดการและออกเลขที่บันทึกข้อความ ประกาศ และหนังสือรับรององค์กรอัตโนมัติ 100% Client-Side Serverless ทำงานได้ทุกที่ ข้อมูลปลอดภัย และเชื่อมต่อ Google Sheets กลางได้ทันที
+              </p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row md:flex-col gap-2.5 shrink-0">
+              <button type="button" onclick="window.app.navigateTo('editor')" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-400 hover:to-cyan-400 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-lg transition cursor-pointer">
+                <i data-lucide="file-plus-2" class="w-4 h-4"></i>
+                <span>สร้างเอกสารใหม่ทันที</span>
+              </button>
+              <button type="button" onclick="window.app.openSettingsModal()" class="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 border border-white/15 text-xs font-semibold flex items-center justify-center gap-2 backdrop-blur-sm transition cursor-pointer">
+                <i data-lucide="sliders" class="w-4 h-4"></i>
+                <span>เปิดการตั้งค่าระบบ</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 1: สถาปัตยกรรม & การเข้าสู่ระบบ -->
+        <div class="glass-surface p-6 sm:p-8 rounded-3xl border border-white/80 shadow-lg space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-sky-500/10 text-sky-700 flex items-center justify-center font-bold text-lg border border-sky-200">1</div>
+            <div>
+              <h3 class="font-bold text-slate-800 text-base font-heading">การเข้าสู่ระบบ &amp; สวิตช์ไฟโคมไฟ (Lamp Login Gateway)</h3>
+              <p class="text-xs text-slate-500">ขั้นตอนการล็อกอินและรหัสผ่านเริ่มต้น</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 text-xs text-slate-600 leading-relaxed">
+            <div class="p-4 bg-white/80 rounded-2xl border border-slate-200 space-y-2">
+              <h4 class="font-bold text-slate-800 flex items-center gap-1.5 text-sm">
+                <i data-lucide="lamp" class="w-4 h-4 text-amber-500"></i>
+                สวิตช์โคมไฟจำลองบรรยากาศ (Interactive Lamp)
+              </h4>
+              <p>เมื่อเปิดระบบครั้งแรก หน้าจอจะอยู่ในโหมดปิดไฟมืด ให้คลิกหรือลากที่ <strong>สายกระตุกโคมไฟ (Pull-cord)</strong> หรือคลิกที่ <strong>หลอดไฟ</strong> เพื่อเปิดแสงสว่างและปลดล็อกแผงควบคุมเข้าสู่ระบบ</p>
+            </div>
+
+            <div class="p-4 bg-sky-50/80 rounded-2xl border border-sky-200 space-y-2">
+              <h4 class="font-bold text-sky-950 flex items-center gap-1.5 text-sm">
+                <i data-lucide="key" class="w-4 h-4 text-sky-600"></i>
+                รหัสผ่านผู้ดูแลระบบ (Admin PIN)
+              </h4>
+              <p>ระบบกำหนดรหัสผ่าน Admin สำหรับการจัดการและตั้งค่าคือ: <code class="bg-sky-100 text-sky-800 px-2 py-0.5 rounded font-mono font-bold text-xs">memoadmin</code></p>
+              <p class="text-[11px] text-slate-500">สามารถใช้ปุ่ม "กรอกรหัสทดสอบอัตโนมัติ" หน้าประตูเข้า หรือพิมพ์เองแล้วกด Enter ได้ทันที</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: ขั้นตอนการออกเอกสารแบบใหม่ 3 สเต็ป -->
+        <div class="glass-surface p-6 sm:p-8 rounded-3xl border border-white/80 shadow-lg space-y-5">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-700 flex items-center justify-center font-bold text-lg border border-emerald-200">2</div>
+            <div>
+              <h3 class="font-bold text-slate-800 text-base font-heading">ขั้นตอนการออกเอกสารแบบใหม่ 3 สเต็ป (New 3-Step Workflow)</h3>
+              <p class="text-xs text-slate-500">แก้ไขปัญหาข้อมูลหาย ด้วยการจองเลขที่ทางการล่วงหน้าก่อนพิมพ์เนื้อหา</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+            <!-- Step 1 Card -->
+            <div class="p-4.5 bg-gradient-to-br from-white to-sky-50/60 rounded-2xl border border-sky-200/80 shadow-xs space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="px-2.5 py-0.5 rounded-full bg-sky-600 text-white font-bold text-[10px]">ขั้นตอนที่ 1</span>
+                <i data-lucide="tag" class="w-4 h-4 text-sky-600"></i>
+              </div>
+              <h4 class="font-bold text-slate-800 text-sm">ออกเลขที่เอกสารล่วงหน้า</h4>
+              <p class="text-slate-600 leading-relaxed">
+                เลือกบริษัทและประเภทเอกสาร จากนั้นกดปุ่ม <strong class="text-emerald-700">"🏷️ ออกเลขที่เอกสารล่วงหน้า (จองเลขทางการทันที)"</strong> ระบบจะออกเลข Running No. ทางการและแสดงบนหัวกระดาษพรีวิวสดทันที
+              </p>
+            </div>
+
+            <!-- Step 2 Card -->
+            <div class="p-4.5 bg-gradient-to-br from-white to-sky-50/60 rounded-2xl border border-sky-200/80 shadow-xs space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="px-2.5 py-0.5 rounded-full bg-sky-600 text-white font-bold text-[10px]">ขั้นตอนที่ 2</span>
+                <i data-lucide="edit-3" class="w-4 h-4 text-sky-600"></i>
+              </div>
+              <h4 class="font-bold text-slate-800 text-sm">พิมพ์เนื้อหา &amp; แนบไฟล์</h4>
+              <p class="text-slate-600 leading-relaxed">
+                กรอกชื่อเรื่อง, ผู้รับ ("เรียน"), ฝ่ายงาน, เนื้อหาบันทึกข้อความใน Rich Editor และเลือกแนบรูปภาพหรือเอกสารประกอบ ข้อมูลจะอัปเดตบนหน้ากระดาษ A4 แบบ Real-time
+              </p>
+            </div>
+
+            <!-- Step 3 Card -->
+            <div class="p-4.5 bg-gradient-to-br from-white to-emerald-50/60 rounded-2xl border border-emerald-200 shadow-xs space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white font-bold text-[10px]">ขั้นตอนที่ 3</span>
+                <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
+              </div>
+              <h4 class="font-bold text-slate-800 text-sm">บันทึกยืนยันเนื้อหา</h4>
+              <p class="text-slate-600 leading-relaxed">
+                เมื่อพิมพ์เสร็จ ให้กดปุ่ม <strong class="text-emerald-700">"💾 บันทึกยืนยันเนื้อหาเอกสาร"</strong> ระบบจะบันทึกสถานะเป็น Published และส่งข้อมูลเข้า Google Sheet / Google Drive อัตโนมัติ (หากเชื่อมต่อไว้)
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: ระบบแนบไฟล์และบีบอัดรูปภาพ -->
+        <div class="glass-surface p-6 sm:p-8 rounded-3xl border border-white/80 shadow-lg space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-indigo-500/10 text-indigo-700 flex items-center justify-center font-bold text-lg border border-indigo-200">3</div>
+            <div>
+              <h3 class="font-bold text-slate-800 text-base font-heading">ระบบแนบไฟล์และการบีบอัดรูปภาพอัจฉริยะ (Smart File Attachment)</h3>
+              <p class="text-xs text-slate-500">ลดขนาดภาพอัตโนมัติผ่าน Canvas ช่วยประหยัดพื้นที่จัดเก็บได้มากกว่า 90%</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-600 leading-relaxed pt-2">
+            <div class="p-4 bg-white/80 rounded-2xl border border-slate-200 space-y-2">
+              <h4 class="font-bold text-slate-800 flex items-center gap-1.5 text-sm">
+                <i data-lucide="sparkles" class="w-4 h-4 text-sky-600"></i>
+                การบีบอัดรูปภาพอัตโนมัติ (Client-Side Compression)
+              </h4>
+              <p>เมื่อท่านเลือกไฟล์ภาพ (JPG, PNG) จากกล้องมือถือหรือสแกนเนอร์ที่มีขนาดใหญ่ 3-8 MB ระบบจะทำการวาดภาพลงบน Offscreen Canvas และบีบอัดให้เหลือขนาดเพียง <strong>50 - 120 KB</strong> โดยที่ความคมชัดและตัวหนังสือในรูปยังชัดเจน 100%</p>
+              <p class="text-[11px] text-emerald-700 font-semibold">ข้อดี: ไม่เปลืองโควต้าหน่วยความจำของเบราว์เซอร์ และโหลดดูย้อนหลังได้รวดเร็วทันใจ</p>
+            </div>
+
+            <div class="p-4 bg-white/80 rounded-2xl border border-slate-200 space-y-2">
+              <h4 class="font-bold text-slate-800 flex items-center gap-1.5 text-sm">
+                <i data-lucide="eye" class="w-4 h-4 text-indigo-600"></i>
+                การเรียกดูและแสดงในหน้าเอกสาร (Preview &amp; Lightbox)
+              </h4>
+              <p>• รายชื่อไฟล์แนบจะปรากฏที่หัวข้อ <strong>"สิ่งที่ส่งมาด้วย / เอกสารแนบ"</strong> ในหน้ากระดาษ A4 และไฟล์ PDF</p>
+              <p>• สามารถคลิกที่ไฟล์แนบเพื่อเปิดหน้าต่างขยายดูภาพขนาดใหญ่ (Lightbox) หรือกดปุ่มดาวน์โหลดไฟล์กลับลงเครื่องได้ตลอดเวลา</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4: การเชื่อมต่อ Google Sheets & Apps Script -->
+        <div class="glass-surface p-6 sm:p-8 rounded-3xl border border-white/80 shadow-lg space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-teal-500/10 text-teal-700 flex items-center justify-center font-bold text-lg border border-teal-200">4</div>
+            <div>
+              <h3 class="font-bold text-slate-800 text-base font-heading">การเชื่อมต่อ Google Sheets &amp; Google Drive (Central Logging)</h3>
+              <p class="text-xs text-slate-500">เก็บบันทึก Log เลขที่เอกสาร, ชื่อเรื่อง, ผู้ลงนาม และไฟล์แนบลง Google Sheet อัตโนมัติ</p>
+            </div>
+          </div>
+
+          <div class="space-y-3 text-xs text-slate-600 leading-relaxed pt-2">
+            <p>ระบบได้รับการฝังการเชื่อมต่อไปยัง Google Apps Script และสมุดทะเบียน Google Sheet (Memo List) กลางไว้พร้อมใช้งานทันที:</p>
+            <div class="p-3.5 bg-emerald-50 rounded-2xl border border-emerald-200 text-xs text-emerald-900 space-y-1.5">
+              <div class="font-bold flex items-center gap-1.5 text-emerald-800">
+                <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
+                เชื่อมต่อระบบบันทึกกลางเรียบร้อยแล้ว (Pre-configured &amp; Live)
+              </div>
+              <div>• <strong>Google Sheet Memo List:</strong> <a href="https://docs.google.com/spreadsheets/d/1JpBrTgqbM0VbRTVPbDFwkY2__W1AkLSxtljKJs_4Xl8/edit?gid=0#gid=0" target="_blank" class="underline font-mono text-emerald-700">1JpBrTgqbM0VbRTVPbDFwkY2__W1AkLSxtljKJs_4Xl8</a></div>
+              <div>• <strong>ปุ่มเรียกดูข้อมูลด่วน:</strong> สามารถคลิกปุ่ม <strong>"ทะเบียน Google Sheet"</strong> จากแถบเมนูด้านซ้าย, แถบด้านบน, หน้าคลังเอกสาร หรือหน้าทะเบียนคุม เพื่อเปิดหน้าต่างดูตารางสดในโปรแกรมได้ทันที 1 คลิก</div>
+            </div>
+
+            <div class="p-4 bg-slate-900 text-slate-200 rounded-2xl font-mono text-[11px] space-y-2 overflow-x-auto">
+              <div class="text-emerald-400 font-bold"># กรณีต้องการปรับแต่งหรือติดตั้ง Apps Script ด้วยตนเอง:</div>
+              <div>1. เปิด Google Sheet > เลือกเมนู <strong>ส่วนขยาย (Extensions) > Apps Script</strong></div>
+              <div>2. คัดลอกโค้ดทั้งหมดจากไฟล์ <span class="text-sky-300">google-apps-script/Code.gs</span> ไปวางแทนที่โค้ดเดิม</div>
+              <div>3. กดปุ่ม <strong>"ทำให้ใช้งานได้" (Deploy) > "การทำให้ใช้งานได้ใหม่" (New deployment)</strong></div>
+              <div>4. เลือกประเภท: <strong>เว็บแอป (Web app)</strong> | สิทธิ์เข้าถึง (Who has access): <strong>ทุกคน (Anyone)</strong></div>
+              <div>5. นำ URL ที่ได้ มาวางในเมนู <strong>"ตั้งค่าระบบ (Settings)"</strong> ของแอป แล้วกดปุ่ม <strong>"ทดสอบการเชื่อมต่อ"</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 5: การ Deploy ขึ้น GitHub Pages -->
+        <div class="glass-surface p-6 sm:p-8 rounded-3xl border border-white/80 shadow-lg space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-violet-500/10 text-violet-700 flex items-center justify-center font-bold text-lg border border-violet-200">5</div>
+            <div>
+              <h3 class="font-bold text-slate-800 text-base font-heading">การ Deploy ขึ้น GitHub Pages ด้วยไฟล์ index.html ไฟล์เดียว</h3>
+              <p class="text-xs text-slate-500">สถาปัตยกรรม Single-File พร้อมใช้งานได้ทันที ไม่ต้องติดตั้งโปรแกรมหรือเซิร์ฟเวอร์</p>
+            </div>
+          </div>
+
+          <div class="text-xs text-slate-600 leading-relaxed space-y-2">
+            <p>ไฟล์ <code class="bg-slate-100 px-2 py-0.5 rounded text-sky-800 font-mono font-bold">index.html</code> ของระบบได้รับการรวม CSS, JavaScript, โลโก้เวกเตอร์ และฟังก์ชันทั้งหมดไว้ในไฟล์เดียวอย่างสมบูรณ์</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+              <div class="p-3 bg-white/80 rounded-xl border border-slate-200">
+                <span class="font-bold text-slate-800">1. อัปโหลดขึ้น GitHub Repository</span>
+                <p class="text-slate-500 mt-1">นำไฟล์ index.html วางไว้ที่ Root ของ Repository</p>
+              </div>
+              <div class="p-3 bg-white/80 rounded-xl border border-slate-200">
+                <span class="font-bold text-slate-800">2. เปิด GitHub Pages</span>
+                <p class="text-slate-500 mt-1">ไปที่ Settings > Pages > Deploy from a branch > เลือก Branch: main / root แล้วกด Save</p>
+              </div>
+            </div>
+            <p class="text-[11px] text-emerald-700 font-semibold pt-1">✅ ผลลัพธ์: ท่านจะได้ลิงก์เว็บไซต์ระบบ Memo All In One ใช้งานได้ฟรีตลอดชีพ ปลอดภัย และเปิดใช้งานได้จากคอมพิวเตอร์และแท็บเล็ตทุกเครื่อง</p>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- =======================================================================
+       MODAL 1: PIN CODE AUTH (memoadmin)
+       ======================================================================= -->
+  <div id="settings-pin-modal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass-modal-panel rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
+      <div class="text-center">
+        <div class="w-13 h-13 bg-sky-500/10 border border-sky-500/20 text-sky-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
+          <i data-lucide="lock" class="w-6 h-6"></i>
+        </div>
+        <h3 class="font-bold text-slate-800 text-lg font-heading">เข้าสู่ระบบตั้งค่า (Settings)</h3>
+        <p class="text-xs text-slate-500 mt-1">ต้องใช้รหัสผ่านผู้ดูแลระบบเพื่อเข้าถึง</p>
+      </div>
+
+      <div class="space-y-2">
+        <input type="password" id="settings-pin-input" placeholder="ใส่รหัสผ่าน..." class="w-full text-center text-lg tracking-widest p-2.5 glass-input rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono">
+        <p class="text-[11px] text-slate-400 text-center">รหัสเริ่มต้นสำหรับทดสอบ: <code class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-600 font-semibold">memoadmin</code></p>
+      </div>
+
+      <div class="flex gap-2 pt-2">
+        <button type="button" onclick="window.app.closeModal('settings-pin-modal')" class="w-1/2 py-2.5 rounded-xl border border-slate-300 text-slate-600 text-xs font-semibold hover:bg-slate-50 cursor-pointer">
+          ยกเลิก
+        </button>
+        <button type="button" id="btn-verify-pin" class="w-1/2 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white text-xs font-semibold shadow-md cursor-pointer">
+          ยืนยัน
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MODAL 2: MASTER SETTINGS
+       ======================================================================= -->
+  <div id="settings-main-modal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass-modal-panel rounded-3xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in duration-150">
+      
+      <div class="p-5 border-b border-slate-200/80 bg-white/60 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-700 flex items-center justify-center">
+            <i data-lucide="sliders" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-800 text-base font-heading">ระบบตั้งค่าและมาสเตอร์ดาต้า (Settings)</h3>
+            <p class="text-xs text-emerald-600 font-semibold">เข้าสู่ระบบด้วยรหัส memoadmin เรียบร้อย</p>
+          </div>
+        </div>
+        <button type="button" onclick="window.app.closeModal('settings-main-modal')" class="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100 transition cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-6 space-y-6">
+        
+        <!-- Companies Master -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              <i data-lucide="building-2" class="w-4 h-4 text-sky-600"></i>
+              รายชื่อบริษัทฯ และโลโก้
+            </h4>
+            <button type="button" onclick="window.app.addCompanyPrompt()" class="text-xs bg-sky-500/10 text-sky-700 hover:bg-sky-500/20 px-3 py-1.5 rounded-xl font-semibold border border-sky-200 cursor-pointer">
+              + เพิ่มบริษัทใหม่
+            </button>
+          </div>
+          <div id="settings-companies-list" class="space-y-2">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+
+        <div class="border-t border-slate-200/60"></div>
+
+        <!-- Presets: Positions -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              <i data-lucide="briefcase" class="w-4 h-4 text-sky-600"></i>
+              จัดการตำแหน่งงาน (Positions)
+            </h4>
+            <button type="button" onclick="window.app.addPresetPrompt('positions')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl font-semibold cursor-pointer">
+              + เพิ่มตำแหน่ง
+            </button>
+          </div>
+          <div id="settings-positions-chips" class="flex flex-wrap gap-2">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+
+        <div class="border-t border-slate-200/60"></div>
+
+        <!-- Google Sheets, Google Drive & Webhook Configurations -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              <i data-lucide="sheet" class="w-4 h-4 text-emerald-600"></i>
+              การเชื่อมต่อ Google Sheets, Google Drive &amp; Webhook
+            </h4>
+            <span class="text-[10px] text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full font-semibold">บันทึก Log อัตโนมัติ</span>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Google Apps Script Webhook URL (สำหรับบันทึก Log ลง Sheet และจัดเก็บไฟล์)</label>
+            <div class="flex gap-2">
+              <input type="text" id="settings-webhook-url" placeholder="https://script.google.com/macros/s/.../exec" class="flex-1 text-xs p-2.5 glass-input rounded-xl font-mono">
+              <button type="button" id="btn-test-apps-script" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shrink-0 flex items-center gap-1.5 shadow-sm transition cursor-pointer">
+                <i data-lucide="radio" class="w-3.5 h-3.5"></i>
+                <span>ทดสอบเชื่อมต่อ</span>
+              </button>
+            </div>
+            <p class="text-[11px] text-slate-500 mt-1">
+              คัดลอกโค้ดจาก <code class="text-sky-600 font-mono font-bold">google-apps-script/Code.gs</code> ไปวางใน Apps Script ของ Google Sheet เพื่อบันทึกข้อมูลและไฟล์แนบ
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Google Sheets URL (ทะเบียนคุมเอกสารกลาง Memo List)</label>
+            <div class="flex gap-2">
+              <input type="text" id="settings-sheet-url" placeholder="https://docs.google.com/spreadsheets/d/.../edit" class="flex-1 text-xs p-2.5 glass-input rounded-xl font-mono">
+              <button type="button" id="btn-open-sheet-settings" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold shrink-0 flex items-center gap-1.5 shadow-sm transition cursor-pointer">
+                <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                <span>เปิดดู Sheet</span>
+              </button>
+            </div>
+            <p class="text-[11px] text-slate-500 mt-1">
+              Google Sheet ทะเบียนคุมเอกสารกลาง จัดเก็บบันทึกประวัติและลิงก์ไฟล์แนบ Drive
+            </p>
+          </div>
+
+          <div class="flex items-center gap-2 pt-1 bg-emerald-50/60 p-2.5 rounded-xl border border-emerald-100">
+            <input type="checkbox" id="settings-auto-sync" class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer">
+            <label for="settings-auto-sync" class="text-xs text-slate-700 font-medium cursor-pointer">
+              ซิงค์ข้อมูลและไฟล์แนบไปยัง Google Sheet &amp; Drive อัตโนมัติทุกครั้งที่กด <strong>"บันทึกยืนยันเนื้อหาเอกสาร"</strong>
+            </label>
+          </div>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Google Drive Folder ID</label>
+              <input type="text" id="settings-drive-id" class="w-full text-xs p-2.5 glass-input rounded-xl font-mono">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">บัญชี Google Drive กลาง</label>
+              <input type="text" id="settings-drive-email" class="w-full text-xs p-2.5 glass-input rounded-xl">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Google Drive Folder URL</label>
+            <input type="text" id="settings-drive-url" class="w-full text-xs p-2.5 glass-input rounded-xl font-mono">
+          </div>
+        </div>
+
+      </div>
+
+      <div class="p-4 border-t border-slate-200/80 bg-white/60 flex justify-end gap-2">
+        <button type="button" onclick="window.app.closeModal('settings-main-modal')" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-600 text-xs font-semibold hover:bg-white cursor-pointer">
+          ปิดหน้าต่าง
+        </button>
+        <button type="button" id="btn-save-settings" class="px-5 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white text-xs font-semibold shadow-md cursor-pointer">
+          บันทึกการตั้งค่า
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MODAL 3: DIGITAL SIGNATURE PAD
+       ======================================================================= -->
+  <div id="signature-modal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass-modal-panel rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold text-slate-800 text-base font-heading flex items-center gap-2">
+          <i data-lucide="signature" class="w-5 h-5 text-sky-600"></i>
+          ลงลายมือชื่อดิจิทัล (Digital Signature)
+        </h3>
+        <button type="button" onclick="window.app.closeModal('signature-modal')" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div>
+        <p class="text-xs text-slate-500 mb-2">วาดลายเซ็นสดด้วยเมาส์, นิ้วมือ หรือปากกาสไตลัสบนช่องด้านล่าง:</p>
+        <canvas id="sig-canvas" width="400" height="180" class="w-full bg-white rounded-2xl"></canvas>
+      </div>
+
+      <div class="flex items-center justify-between text-xs">
+        <button type="button" id="sig-clear-btn" class="text-red-500 hover:text-red-700 font-semibold cursor-pointer">
+          ล้างกระดานวาด
+        </button>
+        <label class="text-sky-600 hover:text-sky-700 font-semibold cursor-pointer">
+          หรืออัปโหลดไฟล์รูปลายเซ็น (PNG)
+          <input type="file" id="sig-file-input" accept="image/*" class="hidden">
+        </label>
+      </div>
+
+      <div class="flex gap-2 pt-2 border-t border-slate-100">
+        <button type="button" onclick="window.app.closeModal('signature-modal')" class="w-1/2 py-2.5 rounded-xl border border-slate-300 text-slate-600 text-xs font-semibold hover:bg-slate-50 cursor-pointer">
+          ยกเลิก
+        </button>
+        <button type="button" id="sig-apply-btn" class="w-1/2 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white text-xs font-semibold shadow-md cursor-pointer">
+          นำลายเซ็นไปใช้
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MODAL 4: EMAIL COMPOSER
+       ======================================================================= -->
+  <div id="email-modal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass-modal-panel rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold text-slate-800 text-base font-heading flex items-center gap-2">
+          <i data-lucide="send" class="w-5 h-5 text-indigo-600"></i>
+          ส่งอีเมลเอกสารทางการ
+        </h3>
+        <button type="button" onclick="window.app.closeModal('email-modal')" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">ถึง (Email ผู้รับ)</label>
+          <input type="email" id="email-to-input" placeholder="example@company.com" class="w-full text-xs p-2.5 glass-input rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">หัวข้ออีเมล</label>
+          <input type="text" id="email-subject-input" class="w-full text-xs p-2.5 glass-input rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">ข้อความในอีเมล</label>
+          <textarea id="email-body-input" rows="5" class="w-full text-xs p-2.5 glass-input rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 leading-relaxed"></textarea>
+        </div>
+      </div>
+
+      <div class="flex gap-2 pt-2 border-t border-slate-100">
+        <button type="button" onclick="window.app.closeModal('email-modal')" class="w-1/2 py-2.5 rounded-xl border border-slate-300 text-slate-600 text-xs font-semibold hover:bg-slate-50 cursor-pointer">
+          ยกเลิก
+        </button>
+        <button type="button" id="btn-confirm-send-email" class="w-1/2 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-500 hover:to-sky-500 text-white text-xs font-semibold shadow-md cursor-pointer">
+          ส่งอีเมล
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MODAL 5: COMPANY EDIT / CREATE MODAL (INCLUDING TAX ID 13 DIGITS)
+       ======================================================================= -->
+  <div id="company-edit-modal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass-modal-panel rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-200/80 pb-3">
+        <h3 id="company-modal-title" class="font-bold text-slate-800 text-base font-heading flex items-center gap-2">
+          <i data-lucide="building-2" class="w-5 h-5 text-sky-600"></i>
+          <span>แก้ไขข้อมูลบริษัทและเลขประจำตัวผู้เสียภาษี</span>
+        </h3>
+        <button type="button" onclick="window.app.closeModal('company-edit-modal')" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <input type="hidden" id="modal-comp-id">
+
+      <!-- Logo Preview & File Upload -->
+      <div class="flex items-center gap-3 bg-white/70 p-3 rounded-2xl border border-slate-200">
+        <div class="w-20 h-14 bg-white rounded-xl border border-slate-200 flex items-center justify-center p-1 overflow-hidden shrink-0">
+          <img id="modal-comp-logo-preview" src="assets/images/twp_logo.png" alt="Company Logo" class="max-h-full max-w-full object-contain">
+        </div>
+        <div>
+          <label class="text-xs bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white px-3 py-1.5 rounded-xl font-semibold cursor-pointer shadow-xs inline-flex items-center gap-1.5 transition">
+            <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+            <span>เปลี่ยนรูปโลโก้บริษัท</span>
+            <input type="file" id="modal-comp-logo-input" accept="image/*" class="hidden">
+          </label>
+          <p class="text-[11px] text-slate-400 mt-1">รองรับไฟล์ภาพ PNG, JPG, SVG</p>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่อบริษัท (Company Name) <span class="text-rose-500">*</span></label>
+          <input type="text" id="modal-comp-name" placeholder="เช่น สำนักพิมพ์ ไทยวัฒนาพานิช จำกัด" class="w-full text-xs p-2.5 glass-input rounded-xl font-medium focus:ring-2 focus:ring-sky-500 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">รหัสย่อ (Code)</label>
+            <input type="text" id="modal-comp-code" placeholder="เช่น TWP" class="w-full text-xs p-2.5 glass-input rounded-xl uppercase font-mono">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">คำนำหน้าเลขที่ (Prefix)</label>
+            <input type="text" id="modal-comp-prefix" placeholder="เช่น ทวพ" class="w-full text-xs p-2.5 glass-input rounded-xl">
+          </div>
+        </div>
+
+        <!-- Highlighted Tax ID Input -->
+        <div class="bg-amber-50/70 p-3.5 rounded-2xl border border-amber-200">
+          <label class="block text-xs font-bold text-amber-900 mb-1 flex items-center justify-between">
+            <span class="flex items-center gap-1.5">
+              <i data-lucide="receipt-text" class="w-4 h-4 text-amber-700"></i>
+              เลขประจำตัวผู้เสียภาษี 13 หลัก (Tax ID)
+            </span>
+            <span class="text-[10px] text-amber-700 bg-amber-100 px-2 py-0.5 rounded font-semibold">แสดงที่ Footer เอกสาร</span>
+          </label>
+          <input type="text" id="modal-comp-taxid" placeholder="0105501000781 (ตัวเลข 13 หลัก)" maxlength="13" class="w-full text-xs p-2.5 glass-input rounded-xl font-mono font-bold text-slate-800 tracking-wider focus:ring-2 focus:ring-amber-500 focus:outline-none">
+          <p class="text-[10px] text-amber-700 mt-1">กรอกเลขประจำตัวผู้เสียภาษีเพื่อใช้เป็นข้อมูลทางการในส่วนท้ายของเอกสาร</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">เบอร์โทรศัพท์ (Tel)</label>
+            <input type="text" id="modal-comp-tel" placeholder="เช่น 0-2215-0630" class="w-full text-xs p-2.5 glass-input rounded-xl">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">ที่อยู่ (Address)</label>
+            <input type="text" id="modal-comp-address" placeholder="ที่อยู่สำนักงาน..." class="w-full text-xs p-2.5 glass-input rounded-xl">
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+        <button type="button" onclick="window.app.closeModal('company-edit-modal')" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-600 text-xs font-semibold hover:bg-slate-50 cursor-pointer">
+          ยกเลิก
+        </button>
+        <button type="button" id="btn-save-company-modal" class="px-5 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white text-xs font-semibold shadow-md cursor-pointer">
+          บันทึกข้อมูลบริษัท
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MODAL 6: HIGH-FIDELITY PDF PREVIEW & DIRECT PRINT MODAL
+       ======================================================================= -->
+  <div id="pdf-preview-modal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 hidden">
+    <div class="glass-modal-panel rounded-3xl max-w-5xl w-full max-h-[96vh] flex flex-col shadow-2xl overflow-hidden">
+      <!-- Modal Header -->
+      <div class="p-4 glass-card-dark text-white flex flex-wrap items-center justify-between gap-3 shrink-0 border-b border-white/10">
+        <div class="flex items-center gap-2.5">
+          <div class="p-2.5 bg-sky-500/20 text-sky-400 rounded-xl border border-sky-400/30">
+            <i data-lucide="printer" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 id="pdf-modal-title" class="font-bold text-sm font-heading">พิมพ์ / ส่งออกเอกสารทางการ (A4)</h3>
+            <p id="pdf-modal-subtitle" class="text-xs text-slate-300">ตรวจสอบความเรียบร้อยและสั่งพิมพ์หรือบันทึก PDF ทันที</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap">
+          <!-- Print / Native PDF Button -->
+          <button type="button" id="pdf-modal-btn-print" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-md transition cursor-pointer" title="สั่งพิมพ์ออกเครื่องพิมพ์ หรือ บันทึกเป็น PDF (คุณภาพสูงสุด คมชัด 100%)">
+            <i data-lucide="printer" class="w-4 h-4"></i>
+            <span>พิมพ์ / บันทึก PDF</span>
+          </button>
+
+          <!-- Open in Standalone Preview Tab Button -->
+          <button type="button" id="pdf-modal-btn-view-tab" class="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-md transition cursor-pointer" title="เปิดดูเอกสาร A4 ในแท็บใหม่แบบเต็มตาและสั่งพิมพ์ได้">
+            <i data-lucide="external-link" class="w-4 h-4"></i>
+            <span>เปิดดูแท็บใหม่</span>
+          </button>
+          
+          <!-- Download PDF file button -->
+          <button type="button" id="pdf-modal-btn-download" class="px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-md transition cursor-pointer" title="ดาวน์โหลดเป็นไฟล์ PDF ลงเครื่อง">
+            <i data-lucide="download" class="w-4 h-4"></i>
+            <span>ดาวน์โหลด .PDF</span>
+          </button>
+
+          <!-- Download Word button -->
+          <button type="button" id="pdf-modal-btn-word" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 border border-white/15 text-xs font-medium flex items-center gap-1 transition cursor-pointer" title="ดาวน์โหลดเป็นไฟล์ Microsoft Word (.doc)">
+            <i data-lucide="file-down" class="w-4 h-4"></i>
+            <span>Word</span>
+          </button>
+
+          <button type="button" onclick="window.app.closeModal('pdf-preview-modal')" class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition ml-1 cursor-pointer" title="ปิดหน้าต่าง">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Preview Sheet Area -->
+      <div class="flex-1 overflow-y-auto p-4 sm:p-8 bg-slate-200 flex justify-center items-start">
+        <div id="pdf-modal-sheet-wrapper" class="bg-white shadow-2xl transition-all">
+          <!-- Rendered document dynamically injected by app.openPdfPreviewModal() -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MODAL 7: ATTACHMENT LIGHTBOX PREVIEW MODAL
+       ======================================================================= -->
+  <div id="attachment-lightbox-modal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 hidden">
+    <div class="glass-modal-panel rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in duration-150">
+      <div class="p-4 border-b border-slate-200/80 bg-white/80 backdrop-blur-md flex items-center justify-between">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-9 h-9 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-700 flex items-center justify-center shrink-0">
+            <i data-lucide="paperclip" class="w-5 h-5"></i>
+          </div>
+          <div class="min-w-0">
+            <h3 id="lightbox-title" class="font-bold text-slate-800 text-sm font-heading truncate">ตัวอย่างไฟล์แนบ</h3>
+            <p id="lightbox-subtitle" class="text-xs text-slate-500">ขนาดไฟล์</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <a id="lightbox-download-btn" href="#" download class="px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span>ดาวน์โหลดไฟล์</span>
+          </a>
+          <button type="button" onclick="window.app.closeModal('attachment-lightbox-modal')" class="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer" title="ปิดหน้าต่าง">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+      <div id="lightbox-body" class="p-6 overflow-y-auto flex-1 flex items-center justify-center bg-slate-100/60">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MODAL 8: GOOGLE SHEET CENTRAL REGISTRY VIEWER (IN-APP EMBEDDED MODAL)
+       ======================================================================= -->
+  <div id="google-sheet-viewer-modal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-5 hidden">
+    <div class="glass-modal-panel rounded-3xl max-w-6xl w-full h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-emerald-500/30">
+      <!-- Modal Header -->
+      <div class="p-4 bg-gradient-to-r from-emerald-800 to-teal-900 text-white flex flex-wrap items-center justify-between gap-3 shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 bg-emerald-500/20 text-emerald-300 rounded-xl border border-emerald-400/30 flex items-center justify-center shadow-xs">
+            <i data-lucide="sheet" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-bold text-sm sm:text-base font-heading">ทะเบียนคุมเอกสาร Google Sheets (Memo List)</h3>
+              <span class="px-2 py-0.5 text-[10px] font-bold bg-emerald-500/30 border border-emerald-400/40 rounded-full text-emerald-200">LIVE SYNC</span>
+            </div>
+            <p class="text-xs text-emerald-200/80">สมุดทะเบียนส่วนกลาง แสดงเลขที่เอกสาร วันที่ เรื่อง ผู้ลงนาม ลิงก์ PDF และไฟล์แนบ</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap">
+          <!-- Refresh iframe button -->
+          <button type="button" id="btn-refresh-sheet-frame" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer" title="รีเฟรชข้อมูลในตาราง">
+            <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
+            <span class="hidden sm:inline">รีเฟรช</span>
+          </button>
+          
+          <!-- Open in new tab button -->
+          <a id="btn-open-sheet-external" href="https://docs.google.com/spreadsheets/d/1JpBrTgqbM0VbRTVPbDFwkY2__W1AkLSxtljKJs_4Xl8/edit?gid=0#gid=0" target="_blank" rel="noopener noreferrer" class="px-3.5 py-1.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-900 text-xs font-bold flex items-center gap-1.5 shadow-md transition cursor-pointer">
+            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            <span>เปิดเต็มจอใน Google Sheets</span>
+          </a>
+
+          <!-- Close Modal -->
+          <button type="button" onclick="window.app.closeModal('google-sheet-viewer-modal')" class="p-1.5 rounded-xl text-emerald-200 hover:text-white hover:bg-white/10 transition ml-1 cursor-pointer" title="ปิดหน้าต่าง">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Iframe or responsive preview -->
+      <div class="flex-1 bg-slate-950 relative flex flex-col min-h-0">
+        <iframe id="google-sheet-iframe" 
+                src="" 
+                class="w-full flex-1 border-0 bg-white" 
+                allowfullscreen 
+                loading="lazy">
+        </iframe>
+        
+        <!-- Bottom status bar -->
+        <div class="px-4 py-2.5 bg-slate-900 border-t border-white/10 text-xs text-slate-300 flex flex-wrap items-center justify-between gap-2 shrink-0">
+          <div class="flex items-center gap-2 truncate">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="text-xs">Spreadsheet ID: <strong class="text-white font-mono">1JpBrTgqbM0VbRTVPbDFwkY2__W1AkLSxtljKJs_4Xl8</strong></span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-[11px] text-slate-400 hidden sm:inline">สามารถเปิดแก้ไข คัดกรองข้อมูล และพิมพ์รายงานได้โดยตรงจาก Google Sheets</span>
+            <a href="https://docs.google.com/spreadsheets/d/1JpBrTgqbM0VbRTVPbDFwkY2__W1AkLSxtljKJs_4Xl8/edit?gid=0#gid=0" target="_blank" rel="noopener noreferrer" class="text-emerald-400 hover:underline font-semibold text-xs flex items-center gap-1">
+              เปิด Google Sheet <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MODAL 9: CUSTOM DOCUMENT NUMBER & SEQUENCE GAP HEALING MODAL
+       ======================================================================= -->
+  <div id="custom-number-modal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass-modal-panel rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl border border-sky-400/30">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-500 to-indigo-600 text-white flex items-center justify-center shadow-md">
+            <i data-lucide="edit-3" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-800 text-base font-heading">กำหนดเลขที่เอกสาร / เริ่มต้นใหม่ 001</h3>
+            <p class="text-xs text-slate-500">จัดการลำดับเลขที่ ป้องกันเลขข้าม หรือเริ่มใหม่เมื่อเอกสารถูกลบ</p>
+          </div>
+        </div>
+        <button type="button" onclick="window.app.closeModal('custom-number-modal')" class="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer" title="ปิดหน้าต่าง">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Current Scope / Context Info -->
+      <div class="bg-slate-50 rounded-2xl p-3 border border-slate-200/80 flex items-center justify-between flex-wrap gap-2 text-xs">
+        <div class="flex items-center gap-2">
+          <span class="text-slate-500">สังกัดบริษัท:</span>
+          <span id="custom-num-company-badge" class="font-bold text-sky-700 bg-sky-100 px-2 py-0.5 rounded-lg">-</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-slate-500">ประเภท:</span>
+          <span id="custom-num-type-badge" class="font-semibold text-slate-700 bg-slate-200/80 px-2 py-0.5 rounded-lg">-</span>
+        </div>
+      </div>
+
+      <!-- Quick Action Shortcut Buttons -->
+      <div class="space-y-2">
+        <label class="block text-xs font-bold text-slate-700">ทางลัดกำหนดเลขที่ด่วน:</label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <button type="button" id="btn-set-custom-001" class="p-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition cursor-pointer">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            <span>✨ เริ่มต้นใหม่ที่ 001</span>
+          </button>
+          <button type="button" id="btn-set-custom-autogap" class="p-3 rounded-2xl bg-gradient-to-r from-sky-600 to-blue-700 hover:from-sky-700 hover:to-blue-800 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition cursor-pointer">
+            <i data-lucide="zap" class="w-4 h-4"></i>
+            <span>⚡ ซ่อมลำดับ / เลขว่างถัดไป</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Manual Input Field -->
+      <div class="space-y-2">
+        <label class="block text-xs font-bold text-slate-700">
+          ระบุหรือแก้ไขเลขที่เอกสารที่ต้องการ:
+        </label>
+        <div class="relative">
+          <input type="text" id="custom-num-input" placeholder="เช่น ทวพ. 001/2569" class="w-full text-sm p-3 font-mono font-bold tracking-wide glass-input rounded-2xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:outline-none text-slate-800">
+          <button type="button" id="btn-check-custom-num" class="absolute right-2 top-2 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition cursor-pointer">
+            ตรวจสอบ
+          </button>
+        </div>
+      </div>
+
+      <!-- Realtime Validation Status Container -->
+      <div id="custom-num-status" class="p-3 rounded-2xl text-xs font-medium border transition-all">
+        <!-- Injected dynamically -->
+      </div>
+
+      <!-- Helpful Advice / Guidelines Box -->
+      <div class="bg-amber-50/70 p-3.5 rounded-2xl border border-amber-200/80 text-[11px] text-amber-900 leading-relaxed space-y-1">
+        <div class="font-bold flex items-center gap-1.5 text-amber-950">
+          <i data-lucide="info" class="w-3.5 h-3.5 text-amber-600"></i>
+          คำแนะนำการจัดการลำดับเลขที่:
+        </div>
+        <ul class="list-disc pl-4 space-y-0.5 text-amber-800">
+          <li>หากมีเอกสารเดิมถูกลบออกไป ระบบจะอนุญาตให้นำเลขนั้น (เช่น <strong>001</strong>) กลับมาเปิดเป็นเอกสารใหม่ได้ทันที</li>
+          <li>ระบบจะตรวจสอบแบบเรียลไทม์ ป้องกันไม่ให้บันทึกเลขซ้ำกับเอกสารอื่นที่มีอยู่ในระบบ</li>
+          <li>เมื่อกดยืนยัน เลขที่นี้จะถูกจัดเก็บเข้าคลังเอกสารและสมุดทะเบียนคุม (Audit Trail) โดยอัตโนมัติ</li>
+        </ul>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2.5">
+        <button type="button" onclick="window.app.closeModal('custom-number-modal')" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-600 text-xs font-semibold hover:bg-slate-50 cursor-pointer transition">
+          ยกเลิก
+        </button>
+        <button type="button" id="btn-apply-custom-number" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white text-xs font-bold shadow-md cursor-pointer flex items-center gap-1.5 transition">
+          <i data-lucide="check-circle" class="w-4 h-4"></i>
+          <span>ยืนยันและนำเลขนี้ไปใช้</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATIONS CONTAINER -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- APPLICATION SCRIPTS -->
+  <script src="assets/js/default_logos.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/app.js"></script>
+
+  <script>
+    // Initialize Lucide icons on load and dynamic re-renders
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+    });
+    // Observer or hook for icon re-renders
+    const originalRender = window.app ? window.app.updateLivePreview : null;
+    setInterval(() => {
+      lucide.createIcons();
+    }, 1500);
+  </script>
+
+</body>
+</html>

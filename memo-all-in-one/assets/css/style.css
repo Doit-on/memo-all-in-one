@@ -1,0 +1,770 @@
+/* ==========================================================================
+   Memo All-in-One - Corporate Document Management Stylesheet
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Prompt:wght@400;500;600;700&display=swap');
+
+:root {
+  --primary: #0284c7;
+  --primary-dark: #0369a1;
+  --primary-light: #e0f2fe;
+  --secondary: #0f172a;
+  --accent: #2563eb;
+  --bg-main: #f8fafc;
+  --surface: #ffffff;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+}
+
+body {
+  font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-main);
+  background-color: var(--bg-main);
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, .font-heading {
+  font-family: 'Prompt', 'Sarabun', sans-serif;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ==========================================================================
+   A4 Document Sheet Simulation (WYSIWYG Real-time Preview)
+   ========================================================================== */
+.a4-preview-container {
+  background: #334155;
+  background-image: radial-gradient(#475569 1px, transparent 1px);
+  background-size: 16px 16px;
+  overflow-x: auto;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px 16px;
+  min-height: calc(100vh - 110px);
+  width: 100%;
+}
+
+.a4-sheet-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  transition: width 0.25s ease, height 0.25s ease;
+  margin: 0 auto;
+  flex-shrink: 0;
+}
+
+.a4-sheet,
+#pdf-modal-sheet-wrapper {
+  width: 794px;
+  min-height: 1115px;
+  max-height: 1115px;
+  padding: 20mm 20mm 15mm 25mm;
+  margin: 0 auto;
+  background: #ffffff;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.35), 0 8px 10px -6px rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
+  font-family: 'TH Sarabun New', 'Sarabun', 'Cordia New', 'Leelawadee UI', 'Tahoma', sans-serif !important;
+  font-size: 15pt;
+  line-height: 1.65;
+  color: #000000;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transform-origin: top center;
+  transition: transform 0.25s ease;
+  overflow: hidden;
+}
+
+/* Document specific typography inside sheet: Title is 22pt */
+.a4-sheet .doc-header-title,
+#pdf-modal-sheet-wrapper .doc-header-title {
+  font-family: 'TH Sarabun New', 'Sarabun', 'Prompt', sans-serif;
+  font-size: 22pt;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  line-height: 1.25;
+}
+
+.a4-sheet .doc-label,
+#pdf-modal-sheet-wrapper .doc-label {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Form Panel Collapsible Transition */
+.form-panel-transition {
+  transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease, padding 0.28s ease;
+}
+
+.form-panel-collapsed {
+  width: 0 !important;
+  min-width: 0 !important;
+  max-width: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border-right: none !important;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.a4-sheet .doc-content p,
+#pdf-modal-sheet-wrapper .doc-content p {
+  text-indent: 2.5cm; /* Standard Thai paragraph indent */
+  margin-bottom: 0.6em;
+  text-align: justify;
+  line-height: 1.85;
+}
+
+.a4-sheet .doc-content ul {
+  padding-left: 2.5cm;
+  list-style-type: disc;
+  margin-bottom: 0.9em;
+}
+
+.a4-sheet .doc-content ol {
+  padding-left: 2.5cm;
+  list-style-type: decimal;
+  margin-bottom: 0.9em;
+}
+
+/* Signature block */
+.signature-box {
+  width: 260px;
+  text-align: center;
+  margin-left: auto;
+  margin-right: 0;
+  page-break-inside: avoid;
+}
+
+.signature-img-preview {
+  max-height: 65px;
+  max-width: 200px;
+  object-fit: contain;
+  margin: 0 auto;
+  display: block;
+}
+
+/* Document Footer (ย้ายหน่วยงาน เบอร์โทร เลขผู้เสียภาษีมาไว้ที่นี่ อักษรเล็กกว่าตัวหลัก) */
+.doc-footer {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid #cbd5e1;
+  font-size: 9.5pt;
+  line-height: 1.4;
+  color: #64748b;
+  page-break-inside: avoid;
+}
+
+.doc-footer .footer-primary {
+  font-weight: 600;
+  color: #334155;
+}
+
+/* ==========================================================================
+   Print Stylesheet (Direct A4 Page Printing without Web UI)
+   ========================================================================== */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  
+  html, body {
+    background: #ffffff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  /* Hide app navigation, sidebar, backdrops and control chrome */
+  header, nav, aside, footer, .sidebar, #login-modal, #app-navbar, .no-print,
+  #history-modal, #settings-modal, #guide-modal, #import-export-modal, #attachment-lightbox-modal,
+  .toast, #pdf-modal-btn-print, #pdf-modal-btn-download, #pdf-modal-btn-word, #pdf-modal-btn-view-tab {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* When printing from the PDF preview modal */
+  body.pdf-modal-open #pdf-preview-modal,
+  body.pdf-modal-open #pdf-preview-modal > div,
+  body.pdf-modal-open #pdf-preview-modal .glass-modal-panel {
+    position: static !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    visibility: visible !important;
+    display: block !important;
+  }
+
+  body.pdf-modal-open #pdf-preview-modal .glass-card-dark {
+    display: none !important; /* Hide modal top toolbar */
+  }
+
+  body.pdf-modal-open #pdf-preview-modal .bg-slate-200 {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+
+  body.pdf-modal-open #pdf-modal-sheet-wrapper,
+  body.pdf-modal-open #pdf-modal-sheet-wrapper * {
+    visibility: visible !important;
+  }
+
+  body.pdf-modal-open #pdf-modal-sheet-wrapper {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 210mm !important;
+    min-height: 297mm !important;
+    height: 297mm !important;
+    margin: 0 !important;
+    padding: 20mm 20mm 15mm 25mm !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: #ffffff !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    overflow: hidden !important;
+    page-break-after: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* When printing directly from editor */
+  body:not(.pdf-modal-open) #a4-print-target,
+  body:not(.pdf-modal-open) #a4-print-target * {
+    visibility: visible !important;
+  }
+
+  body:not(.pdf-modal-open) #a4-print-target {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 210mm !important;
+    min-height: 297mm !important;
+    height: 297mm !important;
+    margin: 0 !important;
+    padding: 20mm 20mm 15mm 25mm !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: #ffffff !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    overflow: hidden !important;
+    page-break-after: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  body:not(.pdf-modal-open) main > div:not(.a4-preview-container) {
+    display: none !important;
+  }
+}
+
+/* Company Quick Filter Tabs */
+.company-tab-btn {
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.15s ease-in-out;
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
+  color: #475569;
+  cursor: pointer;
+}
+
+.company-tab-btn:hover {
+  background-color: #f8fafc;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+.company-tab-btn.active {
+  background-color: #0284c7;
+  color: #ffffff;
+  border-color: #0284c7;
+  box-shadow: 0 2px 4px rgba(2, 132, 199, 0.25);
+}
+
+/* ==========================================================================
+   Interactive UI Component Styles
+   ========================================================================== */
+.sidebar-transition {
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s ease;
+}
+
+.tab-active {
+  border-bottom: 3px solid var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* Signature Pad Canvas */
+#sig-canvas {
+  touch-action: none;
+  background-color: #fafafa;
+  border: 2px dashed #cbd5e1;
+  border-radius: 8px;
+  cursor: crosshair;
+}
+
+/* Badge styles */
+.badge-memo {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
+.badge-announcement {
+  background-color: #fef3c7;
+  color: #b45309;
+}
+.badge-salary {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+.badge-work {
+  background-color: #f3e8ff;
+  color: #7e22ce;
+}
+
+/* ==========================================================================
+   Modern Glassmorphism & UI Design System
+   ========================================================================== */
+
+/* Glass Cards & Surfaces */
+.glass-surface {
+  background: rgba(255, 255, 255, 0.76);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+}
+
+.glass-surface-hover {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.glass-surface-hover:hover {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(14, 165, 233, 0.45);
+  box-shadow: 0 20px 40px -15px rgba(2, 132, 199, 0.15), 0 0 0 1px rgba(14, 165, 233, 0.25);
+  transform: translateY(-2px);
+}
+
+.glass-card-dark {
+  background: rgba(15, 23, 42, 0.78);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+}
+
+.glass-header {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
+}
+
+.glass-sidebar {
+  background: rgba(15, 23, 42, 0.90) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 6px 0 30px -4px rgba(0, 0, 0, 0.45) !important;
+}
+
+/* ==========================================================================
+   Prominent Larger Menu Navigation Styles
+   ========================================================================== */
+.nav-item {
+  position: relative;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.09) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  transform: translateX(3px);
+}
+
+.nav-item-active {
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.95) 0%, rgba(14, 165, 233, 0.85) 100%) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 0 10px 25px -4px rgba(2, 132, 199, 0.5), inset 0 1px 1px 0 rgba(255, 255, 255, 0.35) !important;
+}
+
+.nav-item-active .nav-icon-badge {
+  background: rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important;
+}
+
+.nav-item-active::before {
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 5px;
+  height: 24px;
+  border-radius: 9999px;
+  background: #38bdf8;
+  box-shadow: 0 0 14px #38bdf8;
+}
+
+.nav-icon-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.nav-item:hover .nav-icon-badge {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
+}
+
+/* Glassmorphism Inputs */
+.glass-input {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  transition: all 0.2s ease;
+}
+.glass-input:focus {
+  background: #ffffff;
+  border-color: #0284c7;
+  box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.15);
+}
+
+/* Glassmorphism Modals */
+.modal-backdrop {
+  background-color: rgba(15, 23, 42, 0.68) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+}
+
+.glass-modal-panel {
+  background: rgba(255, 255, 255, 0.94) !important;
+  backdrop-filter: blur(28px) !important;
+  -webkit-backdrop-filter: blur(28px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.85) !important;
+  box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.35) !important;
+}
+
+/* Tooltip & Chip buttons */
+.chip-btn {
+  transition: all 0.15s ease-in-out;
+}
+.chip-btn:hover {
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   Interactive Lamp Login Stage & Animation Styles
+   ========================================================================== */
+
+#lamp-login-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background-color: #070b14;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s ease;
+  user-select: none;
+}
+
+#lamp-login-stage.stage-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Ambient room gradient */
+.lamp-room-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 18%, #0f172a 0%, #060913 85%);
+  transition: all 0.5s ease;
+}
+
+#lamp-login-stage.lamp-is-on .lamp-room-bg {
+  background: radial-gradient(circle at 50% 18%, #1e293b 0%, #080d1a 80%);
+}
+
+/* Hanging Lamp Assembly */
+.lamp-assembly {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 30;
+  transform-origin: 50% 0%;
+  transition: transform 0.3s ease;
+}
+
+.lamp-assembly.swinging {
+  animation: lampSwing 1.8s cubic-bezier(0.445, 0.05, 0.55, 0.95);
+}
+
+@keyframes lampSwing {
+  0% { transform: translateX(-50%) rotate(0deg); }
+  20% { transform: translateX(-50%) rotate(4deg); }
+  40% { transform: translateX(-50%) rotate(-3deg); }
+  60% { transform: translateX(-50%) rotate(1.8deg); }
+  80% { transform: translateX(-50%) rotate(-0.8deg); }
+  100% { transform: translateX(-50%) rotate(0deg); }
+}
+
+/* Hanging wire */
+.lamp-cable {
+  width: 3px;
+  height: 95px;
+  background: linear-gradient(180deg, #1e293b 0%, #334155 100%);
+  box-shadow: 0 0 4px rgba(0,0,0,0.6);
+}
+
+/* Socket / Mount */
+.lamp-socket {
+  width: 24px;
+  height: 14px;
+  background: #475569;
+  border-radius: 4px 4px 0 0;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.25);
+}
+
+/* Lamp shade (cone/bell) */
+.lamp-shade-body {
+  width: 140px;
+  height: 62px;
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%);
+  position: relative;
+  border-bottom: 3px solid #38bdf8;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+  transition: all 0.4s ease;
+}
+
+#lamp-login-stage.lamp-is-on .lamp-shade-body {
+  border-bottom-color: #38bdf8;
+  background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
+}
+
+/* Bulb inside/below shade */
+.lamp-bulb {
+  width: 38px;
+  height: 30px;
+  border-radius: 0 0 19px 19px;
+  background: #334155;
+  margin-top: -6px;
+  transition: all 0.35s ease;
+  position: relative;
+  z-index: 2;
+}
+
+#lamp-login-stage.lamp-is-on .lamp-bulb {
+  background: #ffffff;
+  box-shadow: 0 0 35px 14px #38bdf8, 0 0 75px 28px rgba(56, 189, 248, 0.5);
+}
+
+/* Interactive Pull String / Cord */
+.lamp-pull-cord {
+  position: absolute;
+  top: 125px;
+  right: -24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  z-index: 35;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.lamp-pull-cord:hover .lamp-pull-handle {
+  transform: scale(1.18);
+  box-shadow: 0 0 16px #38bdf8;
+}
+
+.lamp-cord-line {
+  width: 2px;
+  height: 72px;
+  background: repeating-linear-gradient(180deg, #94a3b8, #94a3b8 3px, #475569 3px, #475569 6px);
+  box-shadow: 0 0 3px rgba(0,0,0,0.4);
+}
+
+.lamp-pull-handle {
+  width: 14px;
+  height: 22px;
+  border-radius: 7px;
+  background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
+  border: 1px solid #38bdf8;
+  box-shadow: 0 2px 10px rgba(2, 132, 199, 0.5);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+/* Pull animation */
+.lamp-pull-cord.is-pulling {
+  transform: translateY(20px);
+}
+
+/* Cone of Light (Spotlight) */
+.lamp-light-cone {
+  position: absolute;
+  top: 160px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 760px;
+  height: calc(100vh - 160px);
+  max-height: 820px;
+  clip-path: polygon(44% 0%, 56% 0%, 100% 100%, 0% 100%);
+  background: radial-gradient(ellipse at 50% 0%, rgba(56, 189, 248, 0.28) 0%, rgba(14, 165, 233, 0.14) 40%, rgba(3, 105, 161, 0.03) 80%, transparent 100%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+}
+
+#lamp-login-stage.lamp-is-on .lamp-light-cone {
+  opacity: 1;
+}
+
+/* Floor Light Pool */
+.lamp-floor-pool {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 860px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(56, 189, 248, 0.22) 0%, rgba(14, 165, 233, 0.08) 55%, transparent 75%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  z-index: 10;
+}
+
+#lamp-login-stage.lamp-is-on .lamp-floor-pool {
+  opacity: 1;
+}
+
+/* Illuminated Glassmorphic Login Card */
+.lamp-login-card-container {
+  position: relative;
+  z-index: 25;
+  width: 100%;
+  max-width: 440px;
+  padding: 0 16px;
+  margin-top: 135px;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(15px);
+  opacity: 0.12;
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+#lamp-login-stage.lamp-is-on .lamp-login-card-container {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.lamp-glass-card {
+  background: rgba(15, 23, 42, 0.84);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 35px -5px rgba(2, 132, 199, 0.3);
+  border-radius: 28px;
+}
+
+/* Pulsing hint for when lamp is off */
+.lamp-off-hint {
+  position: absolute;
+  top: 225px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  border-radius: 9999px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #7dd3fc;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.25);
+  animation: hintPulse 2.2s infinite ease-in-out;
+  cursor: pointer;
+  z-index: 28;
+  transition: opacity 0.3s ease;
+}
+
+#lamp-login-stage.lamp-is-on .lamp-off-hint {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes hintPulse {
+  0%, 100% { transform: translateY(0); opacity: 0.85; }
+  50% { transform: translateY(-4px); opacity: 1; box-shadow: 0 0 25px rgba(56, 189, 248, 0.5); }
+}
