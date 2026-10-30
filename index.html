@@ -173,6 +173,54 @@ h1, h2, h3, h4, .font-heading {
   margin-bottom: 0.9em;
 }
 
+/* Tables inside documents */
+.a4-sheet .doc-content table,
+#pdf-modal-sheet-wrapper .doc-content table,
+#template-preview-container .doc-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0;
+  font-size: 14pt;
+  line-height: 1.5;
+}
+
+.a4-sheet .doc-content table th,
+.a4-sheet .doc-content table td,
+#pdf-modal-sheet-wrapper .doc-content table th,
+#pdf-modal-sheet-wrapper .doc-content table td,
+#template-preview-container .doc-content table th,
+#template-preview-container .doc-content table td {
+  border: 1px solid #cbd5e1;
+  padding: 6px 10px;
+  vertical-align: middle;
+}
+
+.a4-sheet .doc-content table th,
+#pdf-modal-sheet-wrapper .doc-content table th,
+#template-preview-container .doc-content table th {
+  background-color: #f1f5f9;
+  font-weight: 700;
+  color: #1e293b;
+  text-align: center;
+}
+
+.a4-sheet .doc-content table td p,
+#pdf-modal-sheet-wrapper .doc-content table td p,
+#template-preview-container .doc-content table td p {
+  text-indent: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.a4-sheet .doc-content img,
+#pdf-modal-sheet-wrapper .doc-content img,
+#template-preview-container .doc-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  display: block;
+  margin: 12px auto;
+}
+
 /* Signature block */
 .signature-box {
   width: 260px;
@@ -796,6 +844,144 @@ h1, h2, h3, h4, .font-heading {
   50% { transform: translateY(-4px); opacity: 1; box-shadow: 0 0 25px rgba(56, 189, 248, 0.5); }
 }
 
+/* ==========================================================================
+   Autosave Restore Banner & Template Import Modal Styles
+   ========================================================================== */
+#autosave-restore-banner {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 1px solid #93c5fd;
+  border-radius: 12px;
+  padding: 12px 18px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: 0 2px 8px -2px rgba(59, 130, 246, 0.15);
+  animation: slideDownFade 0.3s ease-out;
+}
+
+@keyframes slideDownFade {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Template Import Modal split view */
+.template-modal-body {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  height: 640px;
+  max-height: 75vh;
+  gap: 0;
+  overflow: hidden;
+}
+
+.template-list-sidebar {
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8fafc;
+  overflow: hidden;
+}
+
+.template-list-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.template-item-card {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.template-item-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px -2px rgba(59, 130, 246, 0.15);
+  transform: translateY(-1px);
+}
+
+.template-item-card.active {
+  border-color: #2563eb;
+  background: #eff6ff;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.template-preview-stage {
+  flex: 1;
+  background-color: #cbd5e1;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.template-preview-sheet {
+  background: #ffffff;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 680px;
+  min-height: 800px;
+  padding: 36px 42px;
+  border-radius: 4px;
+  font-family: 'Sarabun', sans-serif;
+  color: #0f172a;
+}
+
+/* Responsive Mobile Screen Adaptations */
+@media (max-width: 1023px) {
+  #sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    height: 100vh !important;
+    z-index: 50 !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  #sidebar.mobile-open {
+    transform: translateX(0) !important;
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.75) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .template-modal-body {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    height: auto;
+    max-height: 75vh;
+  }
+
+  .template-list-sidebar {
+    max-height: 200px;
+    border-right: none;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .template-preview-stage {
+    padding: 12px;
+  }
+
+  .template-preview-sheet {
+    padding: 20px 16px;
+    min-height: auto;
+  }
+
+  #pdf-modal-sheet-wrapper {
+    max-width: 100% !important;
+    padding: 16px !important;
+  }
+}
+
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans antialiased selection:bg-sky-500 selection:text-white relative">
@@ -1270,9 +1456,9 @@ h1, h2, h3, h4, .font-heading {
                 <!-- Injected by JS -->
               </div>
               <!-- Button to Collapse Form and give 100% width to preview -->
-              <button type="button" id="btn-collapse-form-panel" class="p-2 rounded-xl bg-slate-100/90 hover:bg-slate-200 text-slate-700 hover:text-slate-900 transition flex items-center gap-1.5 text-xs font-semibold cursor-pointer border border-slate-200" title="ย่อฟอร์มเพื่อขยายพรีวิวเอกสารเต็มจอ">
-                <i data-lucide="chevrons-left" class="w-4 h-4"></i>
-                <span class="hidden sm:inline">ย่อฟอร์ม</span>
+              <button type="button" id="btn-collapse-form-panel" class="px-2.5 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 hover:text-sky-900 transition flex items-center gap-1.5 text-xs font-semibold cursor-pointer border border-sky-200" title="ย่อฟอร์มเพื่อขยายพรีวิวเอกสารเต็มจอ">
+                <i data-lucide="eye" class="w-4 h-4 text-sky-600"></i>
+                <span class="inline text-[11px] font-bold text-sky-800">ดูพรีวิว A4</span>
               </button>
             </div>
           </div>
@@ -1318,6 +1504,27 @@ h1, h2, h3, h4, .font-heading {
           <!-- Form Fields Container -->
           <form id="doc-editor-form" class="p-5 space-y-4" onsubmit="return false;">
             
+            <!-- Autosave Recovery Banner (ตรวจจับดราฟต์เดิมอัตโนมัติ) -->
+            <div id="autosave-restore-banner" class="hidden">
+              <div class="flex items-center gap-2.5">
+                <div class="p-1.5 bg-blue-100 text-blue-700 rounded-lg">
+                  <i data-lucide="history" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <p class="text-xs font-bold text-blue-900">ตรวจพบฉบับร่างที่บันทึกไว้ในเบราว์เซอร์</p>
+                  <p id="autosave-draft-time" class="text-[11px] text-blue-700">มีเนื้อหาที่ยังไม่ได้บันทึกเสร็จสิ้น</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <button type="button" id="btn-restore-autosave-draft" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-xs transition cursor-pointer">
+                  กู้คืนร่างเดิม
+                </button>
+                <button type="button" id="btn-dismiss-autosave-draft" class="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-600 text-xs font-medium rounded-lg border border-slate-200 transition cursor-pointer">
+                  ลบและเริ่มใหม่
+                </button>
+              </div>
+            </div>
+
             <!-- Company & Doc Type Selectors -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
@@ -1354,67 +1561,72 @@ h1, h2, h3, h4, .font-heading {
               </div>
             </div>
 
-            <!-- Company Branding, Logo & Tax ID Controls (แก้ไขได้ทันที) -->
-            <div class="p-3.5 bg-sky-50/60 rounded-xl border border-sky-200/80 space-y-3">
-              <div class="flex items-center justify-between">
+            <!-- Company Branding, Logo & Tax ID Controls (พับเก็บได้ เพื่อไม่ให้เกะกะสายตา) -->
+            <div class="p-3.5 bg-sky-50/60 rounded-xl border border-sky-200/80">
+              <div class="flex items-center justify-between cursor-pointer select-none" id="btn-toggle-company-settings">
                 <h4 class="text-xs font-bold text-sky-950 uppercase tracking-wider flex items-center gap-1.5">
                   <i data-lucide="building-2" class="w-4 h-4 text-sky-600"></i>
                   หัวเอกสาร, โลโก้ &amp; ข้อมูลหน่วยงาน
                 </h4>
-                <span class="text-[10px] text-sky-700 bg-sky-100 px-2 py-0.5 rounded font-semibold">ปรับแต่งได้</span>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] text-sky-700 bg-sky-100 px-2 py-0.5 rounded font-semibold" id="company-settings-badge">แก้ไขโลโก้/ที่อยู่</span>
+                  <i data-lucide="chevron-down" id="company-settings-chevron" class="w-4 h-4 text-sky-700 transition-transform duration-200"></i>
+                </div>
               </div>
 
-              <!-- Logo Preview & Custom Upload -->
-              <div class="flex items-center gap-3 bg-white p-2.5 rounded-lg border border-slate-200">
-                <div class="w-16 h-12 bg-slate-50 rounded border border-slate-200 flex items-center justify-center p-1 shrink-0 overflow-hidden">
-                  <img id="form-logo-preview" src="assets/images/twp_logo.png" alt="Logo Preview" class="max-h-full max-w-full object-contain">
-                </div>
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-2">
-                    <label class="text-xs bg-sky-600 hover:bg-sky-700 text-white px-2.5 py-1 rounded-md font-semibold cursor-pointer shadow-xs transition inline-flex items-center gap-1">
-                      <i data-lucide="upload" class="w-3.5 h-3.5"></i>
-                      <span>เปลี่ยนโลโก้</span>
-                      <input type="file" id="form-logo-file-input" accept="image/*" class="hidden">
-                    </label>
-                    <button type="button" id="btn-reset-company-logo" class="text-xs text-slate-500 hover:text-slate-800 underline">
-                      ใช้โลโก้เดิม
-                    </button>
+              <div id="company-settings-content" class="space-y-3 mt-3 hidden">
+                <!-- Logo Preview & Custom Upload -->
+                <div class="flex items-center gap-3 bg-white p-2.5 rounded-lg border border-slate-200">
+                  <div class="w-16 h-12 bg-slate-50 rounded border border-slate-200 flex items-center justify-center p-1 shrink-0 overflow-hidden">
+                    <img id="form-logo-preview" src="assets/images/twp_logo.png" alt="Logo Preview" class="max-h-full max-w-full object-contain">
                   </div>
-                  <p class="text-[10px] text-slate-400 mt-0.5">เปลี่ยนรูปโลโก้หัวเอกสารได้ทันที (PNG, SVG, JPG)</p>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2">
+                      <label class="text-xs bg-sky-600 hover:bg-sky-700 text-white px-2.5 py-1 rounded-md font-semibold cursor-pointer shadow-xs transition inline-flex items-center gap-1">
+                        <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                        <span>เปลี่ยนโลโก้</span>
+                        <input type="file" id="form-logo-file-input" accept="image/*" class="hidden">
+                      </label>
+                      <button type="button" id="btn-reset-company-logo" class="text-xs text-slate-500 hover:text-slate-800 underline">
+                        ใช้โลโก้เดิม
+                      </button>
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-0.5">เปลี่ยนรูปโลโก้หัวเอกสารได้ทันที (PNG, SVG, JPG)</p>
+                  </div>
                 </div>
-              </div>
 
-              <!-- Company Name & Tax ID -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                <div>
-                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">ชื่อหัวเอกสาร / บริษัท</label>
-                  <input type="text" id="form-company-name-input" placeholder="ชื่อบริษัท..." class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none font-medium text-slate-800">
+                <!-- Company Name & Tax ID -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-700 mb-1">ชื่อหัวเอกสาร / บริษัท</label>
+                    <input type="text" id="form-company-name-input" placeholder="ชื่อบริษัท..." class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none font-medium text-slate-800">
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-700 mb-1">เลขประจำตัวผู้เสียภาษี (แสดงที่ Footer)</label>
+                    <input type="text" id="form-company-taxid-input" placeholder="เลขผู้เสียภาษี 13 หลัก..." class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none font-mono text-slate-800">
+                  </div>
                 </div>
-                <div>
-                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">เลขประจำตัวผู้เสียภาษี (แสดงที่ Footer)</label>
-                  <input type="text" id="form-company-taxid-input" placeholder="เลขผู้เสียภาษี 13 หลัก..." class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none font-mono text-slate-800">
-                </div>
-              </div>
 
-              <!-- Tel & Address (to show in footer) -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                <div>
-                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">เบอร์โทรศัพท์ (แสดงที่ Footer)</label>
-                  <input type="text" id="form-company-tel-input" placeholder="เบอร์โทรศัพท์..." class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                <!-- Tel & Address (to show in footer) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-700 mb-1">เบอร์โทรศัพท์ (แสดงที่ Footer)</label>
+                    <input type="text" id="form-company-tel-input" placeholder="เบอร์โทรศัพท์..." class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-700 mb-1">ที่อยู่ (แสดงที่ Footer)</label>
+                    <input type="text" id="form-company-address-input" placeholder="ที่อยู่บริษัท..." class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                  </div>
                 </div>
-                <div>
-                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">ที่อยู่ (แสดงที่ Footer)</label>
-                  <input type="text" id="form-company-address-input" placeholder="ที่อยู่บริษัท..." class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none">
-                </div>
-              </div>
 
-              <!-- Save Company Defaults Button (ใช้ได้ตลอดไปจนกว่าจะแก้ไข) -->
-              <div class="pt-2.5 border-t border-sky-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <span class="text-[11px] text-slate-500">บันทึกโลโก้และข้อมูลนี้ใช้ตลอดไป:</span>
-                <button type="button" id="btn-save-company-defaults" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg font-semibold flex items-center justify-center gap-1.5 shadow-xs transition cursor-pointer" title="บันทึกข้อมูลและโลโก้เป็นค่าเริ่มต้นของบริษัทเพื่อใช้ตลอดไป">
-                  <i data-lucide="check" class="w-3.5 h-3.5"></i>
-                  <span>บันทึกเป็นค่าเริ่มต้นของบริษัทนี้</span>
-                </button>
+                <!-- Save Company Defaults Button (ใช้ได้ตลอดไปจนกว่าจะแก้ไข) -->
+                <div class="pt-2.5 border-t border-sky-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <span class="text-[11px] text-slate-500">บันทึกโลโก้และข้อมูลนี้ใช้ตลอดไป:</span>
+                  <button type="button" id="btn-save-company-defaults" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg font-semibold flex items-center justify-center gap-1.5 shadow-xs transition cursor-pointer" title="บันทึกข้อมูลและโลโก้เป็นค่าเริ่มต้นของบริษัทเพื่อใช้ตลอดไป">
+                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                    <span>บันทึกเป็นค่าเริ่มต้นของบริษัทนี้</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -1431,18 +1643,7 @@ h1, h2, h3, h4, .font-heading {
               </div>
             </div>
 
-            <!-- Recipient ("เรียน") Section -->
-            <div id="memo-recipient-fields" class="space-y-2">
-              <label class="block text-xs font-semibold text-slate-700">เรียน (ถึงใคร)</label>
-              <select id="form-recipient-select" class="w-full text-sm bg-slate-50 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-sky-500 focus:outline-none">
-                <!-- Populated by JS -->
-              </select>
-              <div id="form-recipient-custom-group" class="hidden">
-                <input type="text" id="form-recipient-custom" placeholder="ระบุชื่อหรือตำแหน่งผู้รับ..." class="w-full text-sm bg-amber-50/50 border border-amber-300 rounded-lg p-2 focus:ring-2 focus:ring-amber-500 focus:outline-none">
-              </div>
-            </div>
-
-            <!-- Subject ("เรื่อง") with Autocomplete & Quick Chips -->
+            <!-- Subject ("เรื่อง") FIRST: Standard Thai Corporate Protocol -->
             <div class="space-y-2">
               <div class="flex items-center justify-between">
                 <label class="block text-xs font-semibold text-slate-700">เรื่อง (หัวข้อเอกสาร)</label>
@@ -1457,6 +1658,17 @@ h1, h2, h3, h4, .font-heading {
                 <div id="subject-chips-container" class="flex flex-wrap gap-1.5">
                   <!-- Injected by JS -->
                 </div>
+              </div>
+            </div>
+
+            <!-- Recipient ("เรียน") Section: Follows Subject -->
+            <div id="memo-recipient-fields" class="space-y-2">
+              <label class="block text-xs font-semibold text-slate-700">เรียน (ถึงใคร)</label>
+              <select id="form-recipient-select" class="w-full text-sm bg-slate-50 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                <!-- Populated by JS -->
+              </select>
+              <div id="form-recipient-custom-group" class="hidden">
+                <input type="text" id="form-recipient-custom" placeholder="ระบุชื่อหรือตำแหน่งผู้รับ..." class="w-full text-sm bg-amber-50/50 border border-amber-300 rounded-lg p-2 focus:ring-2 focus:ring-amber-500 focus:outline-none">
               </div>
             </div>
 
@@ -1509,11 +1721,19 @@ h1, h2, h3, h4, .font-heading {
               </div>
             </div>
 
-            <!-- Content Area (Rich Text) -->
+            <!-- Content Area (Rich Text) with Smart Toolbar -->
             <div class="space-y-1.5">
-              <label class="block text-xs font-semibold text-slate-700">เนื้อหาเอกสาร (ไม่จำกัดจำนวนคำ)</label>
-              <!-- Simple Formatting Toolbar -->
-              <div class="flex items-center gap-1 p-1.5 bg-slate-100 rounded-t-lg border border-slate-300 border-b-0">
+              <div class="flex items-center justify-between">
+                <label class="block text-xs font-semibold text-slate-700">เนื้อหาเอกสาร (ไม่จำกัดจำนวนคำ)</label>
+                <!-- Quick Template & External Data Import Button -->
+                <button type="button" id="btn-open-template-import" class="px-2.5 py-1 rounded-lg bg-sky-100 hover:bg-sky-200 text-sky-800 text-[11px] font-bold flex items-center gap-1.5 transition cursor-pointer shadow-xs border border-sky-300/70" title="เลือกแม่แบบสำเร็จรูปที่มีตาราง หรือคัดลอกจากบันทึกเดิม">
+                  <i data-lucide="layers" class="w-3.5 h-3.5 text-sky-600"></i>
+                  <span>📥 คลังแม่แบบ &amp; ดึงข้อมูลเดิม</span>
+                </button>
+              </div>
+
+              <!-- Formatting & Object Toolbar -->
+              <div class="flex flex-wrap items-center gap-1 p-1.5 bg-slate-100 rounded-t-lg border border-slate-300 border-b-0">
                 <button type="button" data-cmd="bold" class="editor-tool-btn p-1.5 rounded hover:bg-white text-slate-700 text-xs font-bold" title="ตัวหนา"><b>B</b></button>
                 <button type="button" data-cmd="italic" class="editor-tool-btn p-1.5 rounded hover:bg-white text-slate-700 text-xs italic" title="ตัวเอียง"><i>I</i></button>
                 <button type="button" data-cmd="underline" class="editor-tool-btn p-1.5 rounded hover:bg-white text-slate-700 text-xs underline" title="ขีดเส้นใต้"><u>U</u></button>
@@ -1523,6 +1743,20 @@ h1, h2, h3, h4, .font-heading {
                 <span class="w-px h-4 bg-slate-300 mx-1"></span>
                 <button type="button" data-cmd="justifyLeft" class="editor-tool-btn p-1.5 rounded hover:bg-white text-slate-700 text-xs" title="ชิดซ้าย"><i data-lucide="align-left" class="w-3.5 h-3.5"></i></button>
                 <button type="button" data-cmd="justifyFull" class="editor-tool-btn p-1.5 rounded hover:bg-white text-slate-700 text-xs" title="กระจายเต็มบรรทัด"><i data-lucide="align-justify" class="w-3.5 h-3.5"></i></button>
+                <span class="w-px h-4 bg-slate-300 mx-1"></span>
+                <!-- Insert Table & Inline Image -->
+                <button type="button" id="btn-editor-insert-table" class="p-1.5 rounded hover:bg-white text-sky-700 text-xs font-semibold flex items-center gap-1" title="แทรกตารางรายการ/งบประมาณ">
+                  <i data-lucide="table" class="w-3.5 h-3.5"></i>
+                  <span>แทรกตาราง</span>
+                </button>
+                <label id="btn-editor-insert-image" class="p-1.5 rounded hover:bg-white text-sky-700 text-xs font-semibold flex items-center gap-1 cursor-pointer" title="แทรกรูปภาพประกอบในเนื้อหา">
+                  <i data-lucide="image" class="w-3.5 h-3.5"></i>
+                  <span>แทรกรูปภาพ</span>
+                  <input type="file" id="editor-image-file-input" accept="image/*" class="hidden">
+                </label>
+                <button type="button" id="btn-editor-clean-format" class="p-1.5 rounded hover:bg-white text-slate-500 hover:text-slate-800 text-xs" title="ล้างฟอนต์หรือสไตล์แปลกปลอมที่ติดมาจากการ Copy ข้อความจากภายนอก">
+                  <i data-lucide="remove-formatting" class="w-3.5 h-3.5"></i>
+                </button>
               </div>
               <div id="rich-content-editor" contenteditable="true" class="min-h-[160px] max-h-[300px] overflow-y-auto p-3 text-sm bg-white border border-slate-300 rounded-b-lg focus:outline-none focus:ring-2 focus:ring-sky-500 leading-relaxed">
                 <!-- Rich text editable -->
@@ -1538,6 +1772,17 @@ h1, h2, h3, h4, .font-heading {
               <div id="form-closing-custom-group" class="hidden">
                 <input type="text" id="form-closing-custom" placeholder="ระบุประโยคปิดท้ายเอง..." class="w-full text-sm bg-amber-50/50 border border-amber-300 rounded-lg p-2 focus:ring-2 focus:ring-amber-500 focus:outline-none">
               </div>
+            </div>
+
+            <!-- Footer Display Switch (Internal Memos default to clean) -->
+            <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl">
+              <div class="flex items-center gap-2">
+                <input type="checkbox" id="form-show-footer-toggle" class="w-4 h-4 rounded text-sky-600 focus:ring-sky-500 border-slate-300 cursor-pointer">
+                <label for="form-show-footer-toggle" class="text-xs font-semibold text-slate-700 cursor-pointer">
+                  แสดงท้ายกระดาษข้อมูลบริษัท (ที่อยู่ / เลขผู้เสียภาษี)
+                </label>
+              </div>
+              <span class="text-[10px] text-slate-400">บันทึกภายในทั่วไปจะไม่แสดงเพื่อความสะอาดเรียบร้อย</span>
             </div>
 
             <!-- Signer Name, Position & Signature Pad -->
@@ -2710,6 +2955,90 @@ h1, h2, h3, h4, .font-heading {
     </div>
   </div>
 
+  <!-- MODAL 10: TEMPLATE & DATA IMPORT MODAL (WITH LIVE PREVIEW) -->
+  <div id="template-import-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full flex flex-col overflow-hidden border border-slate-100 max-h-[92vh]">
+      
+      <!-- Modal Header -->
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-sky-50 to-indigo-50/60">
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-sky-600 text-white rounded-xl shadow-xs">
+            <i data-lucide="layers" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-800">คลังแม่แบบสำเร็จรูป &amp; ดึงข้อมูลจากบันทึกเดิม</h3>
+            <p class="text-xs text-slate-500">เลือกดูตัวอย่างพรีวิวก่อนนำเข้า หรือนำเข้าเฉพาะตาราง/เนื้อหาเพื่อความสะดวกรวดเร็วในการทำงาน</p>
+          </div>
+        </div>
+        <button type="button" onclick="window.app.closeModal('template-import-modal')" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-white rounded-xl transition cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Source Selection Tabs -->
+      <div class="flex items-center px-6 border-b border-slate-200 bg-white gap-4">
+        <button type="button" id="tab-import-templates" class="py-3 px-3 text-xs font-bold border-b-2 border-sky-600 text-sky-600 flex items-center gap-2 cursor-pointer transition">
+          <i data-lucide="layout-template" class="w-4 h-4"></i>
+          <span>แม่แบบเอกสารสำเร็จรูป (Templates)</span>
+        </button>
+        <button type="button" id="tab-import-past-memos" class="py-3 px-3 text-xs font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center gap-2 cursor-pointer transition">
+          <i data-lucide="archive" class="w-4 h-4"></i>
+          <span>คัดลอกจากบันทึกเดิมในระบบ (Past Memos)</span>
+        </button>
+      </div>
+
+      <!-- Modal Body Split View (Left: List, Right: Live Preview) -->
+      <div class="template-modal-body">
+        
+        <!-- Left: List & Search -->
+        <div class="template-list-sidebar">
+          <div class="p-3 border-b border-slate-200 bg-white">
+            <div class="relative">
+              <input type="text" id="template-search-input" placeholder="ค้นหาตามชื่อเรื่องหรือหมวดหมู่..." class="w-full text-xs pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500">
+              <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"></i>
+            </div>
+          </div>
+          
+          <div id="template-items-scroll-list" class="template-list-scroll space-y-2">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+
+        <!-- Right: Live Visual Preview -->
+        <div class="template-preview-stage">
+          <div id="template-preview-sheet" class="template-preview-sheet">
+            <div id="template-preview-container">
+              <!-- Live Preview Injected by JS -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer Action Bar -->
+      <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="text-xs text-slate-500 flex items-center gap-1.5">
+          <i data-lucide="info" class="w-4 h-4 text-sky-600"></i>
+          <span id="template-preview-status-tip">เลือกรายการทางซ้ายเพื่อดูตัวอย่างพรีวิว</span>
+        </div>
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <button type="button" onclick="window.app.closeModal('template-import-modal')" class="flex-1 sm:flex-none px-4 py-2 rounded-xl border border-slate-300 text-slate-600 text-xs font-semibold hover:bg-white transition cursor-pointer">
+            ยกเลิก
+          </button>
+          <button type="button" id="btn-apply-import-content-only" class="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer" title="แทรกเฉพาะตารางและเนื้อหาต่อจากตำแหน่งเดิม ไม่ทับหัวข้อหรือผู้รับ">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <span>แทรกเฉพาะเนื้อหา/ตาราง</span>
+          </button>
+          <button type="button" id="btn-apply-import-full" class="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white text-xs font-bold shadow-sm transition flex items-center justify-center gap-1.5 cursor-pointer" title="นำเข้าทุกช่อง: เรื่อง, เรียน, เนื้อหา, ประโยคปิดท้าย">
+            <i data-lucide="copy-check" class="w-4 h-4"></i>
+            <span>นำเข้าข้อมูลทั้งหมด</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- TOAST NOTIFICATIONS CONTAINER -->
   <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
@@ -2735,7 +3064,9 @@ const STORAGE_KEYS = {
   RUNNING_LOGS: 'memo_running_logs_v1',
   RUNNING_COUNTERS: 'memo_counters_v1',
   SETTINGS: 'memo_settings_v1',
-  ACTIVE_COMPANY: 'memo_active_company_v1'
+  ACTIVE_COMPANY: 'memo_active_company_v1',
+  TEMPLATES: 'memo_templates_v1',
+  AUTOSAVE_DRAFT: 'memo_autosave_draft_v1'
 };
 
 // Initial Company Master Data
@@ -2899,6 +3230,212 @@ const DEFAULT_SAMPLE_DOCUMENTS = [
   }
 ];
 
+// Master Ready-to-Use Templates
+const DEFAULT_TEMPLATES = [
+  {
+    id: 'tpl-purchase',
+    category: 'จัดซื้อ-จัดจ้าง',
+    name: 'ขออนุมัติจัดซื้ออุปกรณ์ / ครุภัณฑ์ / บริการ',
+    icon: '🛒',
+    subject: 'ขออนุมัติจัดซื้ออุปกรณ์และครุภัณฑ์สำนักงาน',
+    toRecipient: 'กรรมการผู้จัดการ',
+    closing: 'จึงเรียนมาเพื่อโปรดพิจารณาอนุมัติ',
+    content: `<p>ด้วยฝ่ายงานมีความประสงค์จะขออนุมัติจัดซื้ออุปกรณ์และครุภัณฑ์ เพื่อสนับสนุนการปฏิบัติงานให้มีประสิทธิภาพยิ่งขึ้นและรองรับการทำงานของพนักงาน โดยมีรายการและความจำเป็นดังต่อไปนี้</p>
+<table style="width:100%; border-collapse:collapse; margin:15px 0;">
+  <thead>
+    <tr style="background:#f1f5f9;">
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:center; width:50px;">ลำดับ</th>
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:left;">รายการ / รายละเอียด</th>
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:center; width:80px;">จำนวน</th>
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:right; width:100px;">ราคา/หน่วย</th>
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:right; width:110px;">ราคารวม (บาท)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">1</td>
+      <td style="border:1px solid #cbd5e1; padding:8px;">อุปกรณ์คอมพิวเตอร์และอุปกรณ์ต่อพ่วงสำหรับการพัฒนาระบบ</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">1 ชุด</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">25,000.00</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">25,000.00</td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">2</td>
+      <td style="border:1px solid #cbd5e1; padding:8px;">โควต้าบริการ Cloud / Gemini AI Package ประจำเดือน</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">1 สิทธิ์</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">3,500.00</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">3,500.00</td>
+    </tr>
+    <tr style="font-weight:bold; background:#f8fafc;">
+      <td colspan="4" style="border:1px solid #cbd5e1; padding:8px; text-align:right;">รวมเป็นเงินทั้งสิ้น (รวมภาษีมูลค่าเพิ่ม)</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">28,500.00</td>
+    </tr>
+  </tbody>
+</table>
+<p>ทั้งนี้ การจัดซื้อดังกล่าวมีงบประมาณรองรับตามแผนงานประจำปีเรียบร้อยแล้ว รายละเอียดเอกสารใบเสนอราคาแนบมาพร้อมนี้</p>`
+  },
+  {
+    id: 'tpl-project',
+    category: 'โครงการและงบประมาณ',
+    name: 'ขออนุมัติโครงการ / กิจกรรม / อบรมสัมมนา',
+    icon: '📊',
+    subject: 'ขออนุมัติจัดโครงการพัฒนาและฝึกอบรมเชิงปฏิบัติการ',
+    toRecipient: 'กรรมการผู้จัดการ',
+    closing: 'จึงเรียนมาเพื่อโปรดพิจารณาอนุมัติงบประมาณและแผนการดำเนินงาน',
+    content: `<p>ตามที่บริษัทฯ มีนโยบายส่งเสริมและยกระดับศักยภาพบุคลากรและพัฒนานวัตกรรมการทำงาน ฝ่ายงานจึงได้จัดทำโครงการอบรมเชิงปฏิบัติการขึ้น โดยมีรายละเอียดวัตถุประสงค์และแผนการดำเนินงานดังนี้</p>
+<p><strong>1. วัตถุประสงค์:</strong> เพื่อเพิ่มทักษะความรู้ความเข้าใจในการประยุกต์ใช้เทคโนโลยีดิจิทัลและ AI ในกระบวนการทำงานให้รวดเร็วและมีประสิทธิภาพ</p>
+<p><strong>2. กลุ่มเป้าหมาย:</strong> พนักงานและผู้เกี่ยวข้อง จำนวน 20 คน</p>
+<p><strong>3. ระยะเวลาและสถานที่:</strong> วันที่ 15 สิงหาคม 2569 ณ ห้องประชุมใหญ่บริษัทฯ</p>
+<p><strong>4. ประมาณการค่าใช้จ่าย:</strong></p>
+<table style="width:100%; border-collapse:collapse; margin:15px 0;">
+  <thead>
+    <tr style="background:#f1f5f9;">
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:center; width:50px;">ลำดับ</th>
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:left;">รายการค่าใช้จ่าย</th>
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:right; width:120px;">จำนวนเงิน (บาท)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">1</td>
+      <td style="border:1px solid #cbd5e1; padding:8px;">ค่าตอบแทนวิทยากรผู้เชี่ยวชาญ (6 ชั่วโมง)</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">30,000.00</td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">2</td>
+      <td style="border:1px solid #cbd5e1; padding:8px;">ค่าอาหารกลางวันและอาหารว่างผู้เข้าอบรม</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">15,000.00</td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">3</td>
+      <td style="border:1px solid #cbd5e1; padding:8px;">ค่าเอกสารและสื่ออุปกรณ์การเรียนรู้ E-Learning</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">12,000.00</td>
+    </tr>
+    <tr style="font-weight:bold; background:#f8fafc;">
+      <td colspan="2" style="border:1px solid #cbd5e1; padding:8px; text-align:right;">รวมงบประมาณทั้งสิ้น</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">57,000.00</td>
+    </tr>
+  </tbody>
+</table>
+<p><strong>5. ประโยชน์ที่คาดว่าจะได้รับ:</strong> พนักงานสามารถนำเครื่องมือดิจิทัลไปประยุกต์ใช้ลดขั้นตอนการทำงานได้จริง และสร้างโมเดลการอบรมสำหรับต่อยอดแก่ลูกค้าภายนอก</p>`
+  },
+  {
+    id: 'tpl-travel',
+    category: 'เบิกจ่ายและสวัสดิการ',
+    name: 'ขออนุมัติเดินทางปฏิบัติงานนอกสถานที่ / เบิกเบี้ยเลี้ยง',
+    icon: '🚗',
+    subject: 'ขออนุมัติเดินทางไปปฏิบัติงานและเบิกจ่ายค่าใช้จ่ายในการเดินทาง',
+    toRecipient: 'ผู้จัดการทั่วไป',
+    closing: 'จึงเรียนมาเพื่อโปรดพิจารณาอนุมัติ',
+    content: `<p>เนื่องด้วยฝ่ายงานมีความจำเป็นต้องเดินทางไปปฏิบัติงานตรวจเช็คหน้างานและประสานงานกับลูกค้าภายนอกสถานที่ จึงขออนุมัติการเดินทางและเบิกจ่ายค่าใช้จ่ายตามระเบียบบริษัทฯ ดังนี้</p>
+<p><strong>1. บุคลากรผู้เดินทาง:</strong> นายสมเกียรติ มั่นคง และทีมงานรวม 3 คน</p>
+<p><strong>2. สถานที่และภารกิจ:</strong> เยี่ยมชมและประสานงานติดตั้งระบบ ณ หน่วยงานลูกค้า จ.ปทุมธานี</p>
+<p><strong>3. วันเวลาเดินทาง:</strong> วันที่ 10 พฤศจิกายน 2569 เวลา 08:30 - 17:30 น.</p>
+<p><strong>4. ประมาณการค่าใช้จ่าย:</strong></p>
+<table style="width:100%; border-collapse:collapse; margin:15px 0;">
+  <thead>
+    <tr style="background:#f1f5f9;">
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:center; width:50px;">ลำดับ</th>
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:left;">รายการ</th>
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:right; width:120px;">จำนวนเงิน (บาท)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">1</td>
+      <td style="border:1px solid #cbd5e1; padding:8px;">ค่าน้ำมันเชื้อเพลิงและค่าทางด่วน (ตามใบเสร็จจริง)</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">1,800.00</td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">2</td>
+      <td style="border:1px solid #cbd5e1; padding:8px;">ค่าเบี้ยเลี้ยงปฏิบัติงานนอกสถานที่ (3 คน x 300 บาท)</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">900.00</td>
+    </tr>
+    <tr style="font-weight:bold; background:#f8fafc;">
+      <td colspan="2" style="border:1px solid #cbd5e1; padding:8px; text-align:right;">รวมเป็นเงินทั้งสิ้น</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">2,700.00</td>
+    </tr>
+  </tbody>
+</table>`
+  },
+  {
+    id: 'tpl-meeting',
+    category: 'การประชุม',
+    name: 'ระเบียบวาระการประชุม / บันทึกการประชุม',
+    icon: '📝',
+    subject: 'แจ้งระเบียบวาระการประชุมคณะกรรมการบริหาร ประจำเดือน',
+    toRecipient: 'คณะกรรมการบริหารและผู้เกี่ยวข้องทุกท่าน',
+    closing: 'จึงเรียนมาเพื่อโปรดทราบและเข้าร่วมการประชุมตามกำหนดเวลา',
+    content: `<p>บริษัทฯ ขอเรียนเชิญเข้าร่วมการประชุมคณะกรรมการบริหารประจำเดือน เพื่อติดตามความคืบหน้าการดำเนินงานและพิจารณาประเด็นสำคัญขององค์กร โดยมีรายละเอียดดังต่อไปนี้</p>
+<p><strong>วัน/เวลา:</strong> วันศุกร์ที่ 28 พฤศจิกายน 2569 เวลา 13:30 - 16:30 น.<br>
+<strong>สถานที่:</strong> ห้องประชุม 1 อาคารสำนักงานใหญ่ (หรือผ่านระบบ Zoom Meeting)</p>
+<p><strong>ระเบียบวาระการประชุม:</strong></p>
+<p><strong>วาระที่ 1:</strong> เรื่องที่ประธานแจ้งให้ที่ประชุมทราบ<br>
+<strong>วาระที่ 2:</strong> รับรองรายงานการประชุมครั้งที่ผ่านมา<br>
+<strong>วาระที่ 3:</strong> เรื่องสืบเนื่องจากการประชุมครั้งก่อน<br>
+&nbsp;&nbsp;3.1 ความคืบหน้าระบบ Memo All-in-One และ Google Sheet Integration<br>
+&nbsp;&nbsp;3.2 การย้ายระบบ Cloud และควบคุมโควต้า AI<br>
+<strong>วาระที่ 4:</strong> เรื่องเพื่อพิจารณา<br>
+&nbsp;&nbsp;4.1 แผนงบประมาณและเป้าหมายประจำไตรมาสถัดไป<br>
+<strong>วาระที่ 5:</strong> เรื่องอื่นๆ (ถ้ามี)</p>`
+  },
+  {
+    id: 'tpl-announcement',
+    category: 'ประกาศและนโยบาย',
+    name: 'ประกาศระเบียบและแนวทางปฏิบัติภายในองค์กร',
+    icon: '📢',
+    subject: 'แนวทางการรักษาความปลอดภัยข้อมูลและการใช้งานระบบสารสนเทศ',
+    toRecipient: 'พนักงานทุกท่าน',
+    closing: 'จึงประกาศมาเพื่อทราบและถือปฏิบัติอย่างเคร่งครัดตั้งแต่บัดนี้เป็นต้นไป',
+    content: `<p>เพื่อให้การดำเนินงานด้านสารสนเทศและการรักษาความปลอดภัยของข้อมูลภายในองค์กรเป็นไปด้วยความเรียบร้อย มีมาตรฐาน และป้องกันความเสียหายที่อาจเกิดขึ้น บริษัทฯ จึงกำหนดแนวทางปฏิบัติให้พนักงานทุกคนถือปฏิบัติดังนี้</p>
+<ol style="margin-left: 20px; line-height: 1.8;">
+  <li>ห้ามเผยแพร่หรือส่งต่อเอกสารสำคัญ ข้อมูลลูกค้า หรือรหัสผ่านของระบบงานแก่บุคคลภายนอกโดยไม่ได้รับอนุญาต</li>
+  <li>การเข้าถึงเอกสารและฐานข้อมูลผ่าน Google Drive และ Google Sheets ต้องกระทำผ่านบัญชีอีเมลทางการของบริษัทฯ เท่านั้น</li>
+  <li>กำหนดให้เปลี่ยนรหัสผ่านระบบงานทุกๆ 90 วัน และตั้งรหัสผ่านที่มีความยาวไม่น้อยกว่า 8 ตัวอักษร</li>
+  <li>หากพบความผิดปกติหรือมีข้อสงสัยเกี่ยวกับระบบ ขอให้แจ้งฝ่ายไอทีและธุรการโดยทันที</li>
+</ol>`
+  },
+  {
+    id: 'tpl-report',
+    category: 'รายงานการปฏิบัติงาน',
+    name: 'รายงานผลการปฏิบัติงาน / ความคืบหน้าประจำเดือน',
+    icon: '📈',
+    subject: 'รายงานผลการดำเนินงานและความคืบหน้าโครงการประจำเดือน',
+    toRecipient: 'ผู้จัดการทั่วไป',
+    closing: 'จึงเรียนมาเพื่อโปรดทราบผลการดำเนินงาน',
+    content: `<p>ฝ่ายงานขอสรุปรายงานผลการปฏิบัติงานและความคืบหน้าของโครงการสำคัญ ประจำเดือนที่ผ่านมา โดยมีรายละเอียดผลลัพธ์การทำงานดังนี้</p>
+<table style="width:100%; border-collapse:collapse; margin:15px 0;">
+  <thead>
+    <tr style="background:#f1f5f9;">
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:center; width:50px;">ลำดับ</th>
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:left;">ภารกิจ / โครงการ</th>
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:center; width:120px;">เป้าหมาย</th>
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:center; width:120px;">ผลการดำเนินงาน</th>
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:center; width:90px;">สถานะ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">1</td>
+      <td style="border:1px solid #cbd5e1; padding:8px;">ปรับปรุงระบบบันทึกข้อความ Memo All-in-One</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">100%</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">100%</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center; color:#16a34a; font-weight:bold;">เรียบร้อย</td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">2</td>
+      <td style="border:1px solid #cbd5e1; padding:8px;">เชื่อมต่อฐานข้อมูล Google Sheets & Google Drive</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">100%</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">100%</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center; color:#16a34a; font-weight:bold;">เรียบร้อย</td>
+    </tr>
+  </tbody>
+</table>
+<p><strong>ปัญหาและอุปสรรค:</strong> -</p>
+<p><strong>แผนการดำเนินงานในเดือนถัดไป:</strong> ติดตามการใช้งานของพนักงานและพัฒนาฟีเจอร์เพิ่มเติมตามข้อเสนอแนะ</p>`
+  }
+];
+
 class StorageManager {
   constructor() {
     this.init();
@@ -2978,6 +3515,9 @@ class StorageManager {
         nueanam: { memo: 0, announcement: 0, salary_cert: 1, work_cert: 0 }
       };
       localStorage.setItem(STORAGE_KEYS.RUNNING_COUNTERS, JSON.stringify(counters));
+    }
+    if (!localStorage.getItem(STORAGE_KEYS.TEMPLATES)) {
+      localStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(DEFAULT_TEMPLATES));
     }
   }
 
@@ -3515,6 +4055,60 @@ class StorageManager {
   verifyAdminPin(pin) {
     const settings = this.getSettings();
     return pin === settings.adminPin;
+  }
+
+  // Ready-to-Use Templates
+  getTemplates() {
+    const tpls = this.get(STORAGE_KEYS.TEMPLATES);
+    if (!tpls || !Array.isArray(tpls) || tpls.length === 0) {
+      return DEFAULT_TEMPLATES;
+    }
+    return tpls;
+  }
+
+  getTemplate(id) {
+    const list = this.getTemplates();
+    return list.find(t => t.id === id) || null;
+  }
+
+  saveTemplate(tpl) {
+    const list = this.getTemplates();
+    const existingIdx = list.findIndex(t => t.id === tpl.id);
+    if (existingIdx >= 0) {
+      list[existingIdx] = tpl;
+    } else {
+      list.unshift(tpl);
+    }
+    this.set(STORAGE_KEYS.TEMPLATES, list);
+    return tpl;
+  }
+
+  deleteTemplate(id) {
+    let list = this.getTemplates();
+    list = list.filter(t => t.id !== id);
+    this.set(STORAGE_KEYS.TEMPLATES, list);
+    return true;
+  }
+
+  // Autosave Draft
+  getAutosaveDraft() {
+    return this.get(STORAGE_KEYS.AUTOSAVE_DRAFT);
+  }
+
+  setAutosaveDraft(data) {
+    return this.set(STORAGE_KEYS.AUTOSAVE_DRAFT, {
+      ...data,
+      savedAt: new Date().toISOString()
+    });
+  }
+
+  clearAutosaveDraft() {
+    try {
+      localStorage.removeItem(STORAGE_KEYS.AUTOSAVE_DRAFT);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }
 
@@ -4811,6 +5405,7 @@ class MemoApp {
     this.renderPresets();
     this.setupSignaturePad();
     this.initRichEditor();
+    this.initAutosave();
     
     // Default form values
     this.resetEditorForm();
@@ -5030,9 +5625,10 @@ class MemoApp {
     } else if (viewId === 'editor') {
       if (docId) {
         this.loadDocForEditing(docId);
-      } else if (!this.currentEditingDocId) {
+      } else if (!this.currentEditingDocId && !this.hasUserEditedForm()) {
         this.resetEditorForm();
       }
+      this.checkAutosaveDraft();
       this.updateLivePreview();
       setTimeout(() => this.autoFitPreview(), 80);
     } else if (viewId === 'archive') {
@@ -5048,8 +5644,15 @@ class MemoApp {
   }
 
   toggleSidebar() {
-    this.isSidebarCollapsed = !this.isSidebarCollapsed;
     const sidebar = document.getElementById('sidebar');
+    if (window.innerWidth < 1024) {
+      if (sidebar) {
+        sidebar.classList.toggle('mobile-open');
+      }
+      return;
+    }
+
+    this.isSidebarCollapsed = !this.isSidebarCollapsed;
     const labels = document.querySelectorAll('.sidebar-label');
     const logoFull = document.getElementById('sidebar-logo-full');
     const logoIcon = document.getElementById('sidebar-logo-icon');
@@ -5382,6 +5985,10 @@ class MemoApp {
     if (headerTitleSelect) headerTitleSelect.value = 'บันทึกภายใน';
     if (headerTitleCustom) headerTitleCustom.value = '';
 
+    // Reset Footer Toggle
+    const footerToggle = document.getElementById('form-show-footer-toggle');
+    if (footerToggle) footerToggle.checked = false;
+
     // Update delete button text
     const deleteBtnText = document.getElementById('btn-delete-doc-text');
     if (deleteBtnText) deleteBtnText.textContent = 'ล้างข้อมูล / ยกเลิก';
@@ -5400,22 +6007,28 @@ class MemoApp {
   loadDocForEditing(docId) {
     const doc = window.storage.getDocument(docId);
     if (!doc) return;
+    this.populateForm(doc);
+    const deleteBtnText = document.getElementById('btn-delete-doc-text');
+    if (deleteBtnText) deleteBtnText.textContent = 'ลบเอกสารฉบับนี้ทิ้ง';
+  }
 
-    this.currentEditingDocId = doc.id;
-    this.activeCompanyId = doc.companyId;
+  populateForm(doc) {
+    if (!doc) return;
+    if (doc.id) this.currentEditingDocId = doc.id;
+    this.activeCompanyId = doc.companyId || 'twp';
     this.signatureDataUrl = doc.signatureImg || '';
     this.customLogoDataUrl = doc.customLogo || '';
 
-    const comp = window.storage.getCompany(doc.companyId);
+    const comp = window.storage.getCompany(this.activeCompanyId);
 
-    document.getElementById('form-company-select').value = doc.companyId;
+    document.getElementById('form-company-select').value = this.activeCompanyId;
     document.getElementById('form-company-name-input').value = doc.customCompanyName || comp.name;
     document.getElementById('form-company-taxid-input').value = doc.customTaxId !== undefined ? doc.customTaxId : (comp.taxId || '');
     document.getElementById('form-company-tel-input').value = doc.customTel !== undefined ? doc.customTel : (comp.tel || '');
     document.getElementById('form-company-address-input').value = doc.customAddress !== undefined ? doc.customAddress : (comp.address || '');
     document.getElementById('form-logo-preview').src = this.customLogoDataUrl || comp.logo;
 
-    document.getElementById('form-doc-type').value = doc.docType;
+    document.getElementById('form-doc-type').value = doc.docType || 'memo';
     document.getElementById('form-doc-date').value = doc.date || new Date().toISOString().split('T')[0];
     document.getElementById('form-subject-input').value = doc.subject || '';
     document.getElementById('form-department-input').value = doc.department || '';
@@ -5423,35 +6036,41 @@ class MemoApp {
 
     // Recipient
     const recSelect = document.getElementById('form-recipient-select');
-    if ([...recSelect.options].some(o => o.value === doc.toRecipient)) {
-      recSelect.value = doc.toRecipient;
-      document.getElementById('form-recipient-custom-group').classList.add('hidden');
-    } else {
-      recSelect.value = '__custom__';
-      document.getElementById('form-recipient-custom-group').classList.remove('hidden');
-      document.getElementById('form-recipient-custom').value = doc.toRecipient || '';
+    if (recSelect) {
+      if ([...recSelect.options].some(o => o.value === doc.toRecipient)) {
+        recSelect.value = doc.toRecipient;
+        document.getElementById('form-recipient-custom-group')?.classList.add('hidden');
+      } else {
+        recSelect.value = '__custom__';
+        document.getElementById('form-recipient-custom-group')?.classList.remove('hidden');
+        document.getElementById('form-recipient-custom').value = doc.toRecipient || '';
+      }
     }
 
     // Position
     const posSelect = document.getElementById('form-signer-position-select');
-    if ([...posSelect.options].some(o => o.value === doc.signerPosition)) {
-      posSelect.value = doc.signerPosition;
-      document.getElementById('form-signer-position-custom-group').classList.add('hidden');
-    } else {
-      posSelect.value = '__custom__';
-      document.getElementById('form-signer-position-custom-group').classList.remove('hidden');
-      document.getElementById('form-signer-position-custom').value = doc.signerPosition || '';
+    if (posSelect) {
+      if ([...posSelect.options].some(o => o.value === doc.signerPosition)) {
+        posSelect.value = doc.signerPosition;
+        document.getElementById('form-signer-position-custom-group')?.classList.add('hidden');
+      } else {
+        posSelect.value = '__custom__';
+        document.getElementById('form-signer-position-custom-group')?.classList.remove('hidden');
+        document.getElementById('form-signer-position-custom').value = doc.signerPosition || '';
+      }
     }
 
     // Closing
     const closeSelect = document.getElementById('form-closing-select');
-    if ([...closeSelect.options].some(o => o.value === doc.closing)) {
-      closeSelect.value = doc.closing;
-      document.getElementById('form-closing-custom-group').classList.add('hidden');
-    } else {
-      closeSelect.value = '__custom__';
-      document.getElementById('form-closing-custom-group').classList.remove('hidden');
-      document.getElementById('form-closing-custom').value = doc.closing || '';
+    if (closeSelect) {
+      if ([...closeSelect.options].some(o => o.value === doc.closing)) {
+        closeSelect.value = doc.closing;
+        document.getElementById('form-closing-custom-group')?.classList.add('hidden');
+      } else {
+        closeSelect.value = '__custom__';
+        document.getElementById('form-closing-custom-group')?.classList.remove('hidden');
+        document.getElementById('form-closing-custom').value = doc.closing || '';
+      }
     }
 
     // Salary Cert Specific
@@ -5466,7 +6085,10 @@ class MemoApp {
     }
 
     // Editor content
-    document.getElementById('rich-content-editor').innerHTML = doc.content || '';
+    const editor = document.getElementById('rich-content-editor');
+    if (editor) {
+      editor.innerHTML = doc.content || '';
+    }
 
     // Document Header Title
     const headerTitleSelect = document.getElementById('form-header-title-select');
@@ -5485,9 +6107,11 @@ class MemoApp {
       }
     }
 
-    // Update delete button text
-    const deleteBtnText = document.getElementById('btn-delete-doc-text');
-    if (deleteBtnText) deleteBtnText.textContent = 'ลบเอกสารฉบับนี้ทิ้ง';
+    // Footer Toggle
+    const footerToggle = document.getElementById('form-show-footer-toggle');
+    if (footerToggle) {
+      footerToggle.checked = Boolean(doc.showFooter);
+    }
 
     // Restore Attachments and Issued Number State
     this.currentAttachments = (doc.attachments && Array.isArray(doc.attachments)) ? [...doc.attachments] : [];
@@ -5495,9 +6119,81 @@ class MemoApp {
     this.renderAttachmentsList();
     this.updateWorkflowSteps(doc.status || 'published');
 
-    this.toggleDocTypeFields(doc.docType);
+    this.toggleDocTypeFields(doc.docType || 'memo');
     this.updateNextNumberDisplay(doc.docNumber);
     this.updateLivePreview();
+  }
+
+  hasUserEditedForm() {
+    const subject = document.getElementById('form-subject-input')?.value?.trim();
+    const editor = document.getElementById('rich-content-editor');
+    const content = editor?.innerHTML?.trim() || '';
+    const isDefaultContent = !content || content === '<p>มีความประสงค์ขออนุมัติดำเนินการ...</p>' || content === '<p><br></p>';
+    const signerName = document.getElementById('form-signer-name-input')?.value?.trim();
+    const empName = document.getElementById('form-emp-name')?.value?.trim();
+    const hasAttachments = this.currentAttachments && this.currentAttachments.length > 0;
+    
+    return Boolean(subject || !isDefaultContent || signerName || empName || hasAttachments || this.currentEditingDocId);
+  }
+
+  // =========================================================================
+  // Autosave Draft Mechanics
+  // =========================================================================
+  initAutosave() {
+    this.checkAutosaveDraft();
+
+    let autosaveTimer = null;
+    const triggerAutosave = () => {
+      clearTimeout(autosaveTimer);
+      autosaveTimer = setTimeout(() => {
+        this.saveAutosaveDraft();
+      }, 1200);
+    };
+
+    const form = document.getElementById('doc-editor-form');
+    if (form) {
+      form.addEventListener('input', triggerAutosave);
+      form.addEventListener('change', triggerAutosave);
+    }
+  }
+
+  checkAutosaveDraft() {
+    const draft = window.storage.getAutosaveDraft();
+    const banner = document.getElementById('autosave-restore-banner');
+    const timeEl = document.getElementById('autosave-draft-time');
+    if (!banner) return;
+
+    if (draft && !this.currentEditingDocId && (draft.subject || (draft.content && draft.content.length > 50))) {
+      banner.classList.remove('hidden');
+      if (timeEl && draft.savedAt) {
+        const time = new Date(draft.savedAt).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+        timeEl.textContent = `ฉบับร่างบันทึกอัตโนมัติ: ${time} น. (${draft.subject || 'ยังไม่ระบุชื่อเรื่อง'})`;
+      }
+    } else {
+      banner.classList.add('hidden');
+    }
+  }
+
+  saveAutosaveDraft() {
+    if (this.currentEditingDocId) return; // Existing doc already in DB
+    if (!this.hasUserEditedForm()) return;
+    const data = this.gatherFormData(false);
+    window.storage.setAutosaveDraft(data);
+  }
+
+  restoreAutosaveDraft() {
+    const draft = window.storage.getAutosaveDraft();
+    if (!draft) return;
+    this.populateForm(draft);
+    document.getElementById('autosave-restore-banner')?.classList.add('hidden');
+    this.showToast('กู้คืนแบบร่างเดิมสำเร็จแล้ว', 'success');
+  }
+
+  dismissAutosaveDraft() {
+    window.storage.clearAutosaveDraft();
+    document.getElementById('autosave-restore-banner')?.classList.add('hidden');
+    this.resetEditorForm();
+    this.showToast('ลบแบบร่างเดิมแล้ว เริ่มต้นใหม่', 'info');
   }
 
   toggleDocTypeFields(docType) {
@@ -5579,7 +6275,8 @@ class MemoApp {
     }
 
     // Shared Standard Footer Component (แสดงหน่วยงาน, โทรศัพท์ และเลขผู้เสียภาษี)
-    const footerHtml = `
+    const shouldShowFooter = d.showFooter ?? (docType === 'salary_cert' || docType === 'work_cert');
+    const footerHtml = shouldShowFooter ? `
       <div class="doc-footer text-left mt-auto pt-2.5 border-t border-slate-200 text-[9.5pt] text-slate-600 leading-normal" style="font-family:'TH Sarabun New','Sarabun','Cordia New','Leelawadee UI','Tahoma',sans-serif;">
         <div>
           <span class="font-semibold text-slate-800">${compName}</span>
@@ -5589,7 +6286,7 @@ class MemoApp {
         ${compTaxId ? `<div>เลขประจำตัวผู้เสียภาษี: <span class="font-mono text-slate-700 font-semibold">${compTaxId}</span></div>` : ''}
         ${compAddress ? `<div class="text-slate-500">${compAddress}</div>` : ''}
       </div>
-    `;
+    ` : '';
 
     if (docType === 'memo') {
       return `
@@ -5611,26 +6308,30 @@ class MemoApp {
               วันที่ ${thaiDate}
             </div>
 
-            <!-- Left Metadata: เรื่อง / เรียน (and ที่ if present) -->
-            <div class="doc-meta-block mb-4 text-[15pt] leading-relaxed">
-              ${(displayDocNo && displayDocNo !== '-' && !displayDocNo.includes('(รอออกเลขที่)')) ? `
-                <div class="flex items-baseline mb-1">
-                  <span class="font-bold inline-block w-[1.8cm] shrink-0">ที่</span>
-                  <span class="font-semibold text-black">${displayDocNo}</span>
-                </div>
-              ` : ''}
-              <div class="flex items-baseline mb-1">
-                <span class="font-bold inline-block w-[1.8cm] shrink-0">เรื่อง</span>
-                <span class="font-semibold text-black">${subject}</span>
-              </div>
-              <div class="flex items-baseline">
-                <span class="font-bold inline-block w-[1.8cm] shrink-0">เรียน</span>
-                <span>${recipient}</span>
-              </div>
+            <!-- Left Metadata: ที่ / เรื่อง / เรียน using aligned 2-column table -->
+            <div class="doc-meta-block mb-3 text-[15pt]">
+              <table style="width: 100%; border: none; border-collapse: collapse; font-size: 15pt; line-height: 1.6;">
+                <tbody>
+                  ${(displayDocNo && displayDocNo !== '-' && !displayDocNo.includes('(รอออกเลขที่)')) ? `
+                    <tr>
+                      <td style="width: 1.8cm; font-weight: bold; vertical-align: top; padding: 2px 0;">ที่</td>
+                      <td style="font-weight: 600; color: #000; vertical-align: top; padding: 2px 0;">${displayDocNo}</td>
+                    </tr>
+                  ` : ''}
+                  <tr>
+                    <td style="width: 1.8cm; font-weight: bold; vertical-align: top; padding: 2px 0;">เรื่อง</td>
+                    <td style="font-weight: 600; color: #000; vertical-align: top; padding: 2px 0;">${subject}</td>
+                  </tr>
+                  <tr>
+                    <td style="width: 1.8cm; font-weight: bold; vertical-align: top; padding: 2px 0;">เรียน</td>
+                    <td style="vertical-align: top; padding: 2px 0;">${recipient}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
 
             <!-- Document Content -->
-            <div class="doc-content my-3 text-[15pt] leading-[1.75] text-justify" style="text-indent: 2.5cm;">
+            <div class="doc-content my-3 text-[15pt] leading-[1.75] text-justify">
               ${contentHtml}
             </div>
 
@@ -5678,22 +6379,26 @@ class MemoApp {
               <h1 class="doc-header-title text-[22pt] font-bold text-black tracking-wide leading-tight">${headerTitle || 'ประกาศ'}</h1>
             </div>
 
-            <!-- Left Metadata: เลขที่ / เรื่อง -->
-            <div class="doc-meta-block mb-5 text-[15pt] leading-relaxed">
-              ${(displayDocNo && displayDocNo !== '-') ? `
-                <div class="flex items-baseline mb-1">
-                  <span class="font-bold inline-block w-[1.8cm] shrink-0">เลขที่</span>
-                  <span class="font-semibold text-black">${displayDocNo}</span>
-                </div>
-              ` : ''}
-              <div class="flex items-baseline">
-                <span class="font-bold inline-block w-[1.8cm] shrink-0">เรื่อง</span>
-                <span class="font-semibold text-black">${subject}</span>
-              </div>
+            <!-- Left Metadata: เลขที่ / เรื่อง using aligned 2-column table -->
+            <div class="doc-meta-block mb-4 text-[15pt]">
+              <table style="width: 100%; border: none; border-collapse: collapse; font-size: 15pt; line-height: 1.6;">
+                <tbody>
+                  ${(displayDocNo && displayDocNo !== '-') ? `
+                    <tr>
+                      <td style="width: 1.8cm; font-weight: bold; vertical-align: top; padding: 2px 0;">เลขที่</td>
+                      <td style="font-weight: 600; color: #000; vertical-align: top; padding: 2px 0;">${displayDocNo}</td>
+                    </tr>
+                  ` : ''}
+                  <tr>
+                    <td style="width: 1.8cm; font-weight: bold; vertical-align: top; padding: 2px 0;">เรื่อง</td>
+                    <td style="font-weight: 600; color: #000; vertical-align: top; padding: 2px 0;">${subject}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
 
             <!-- Document Content -->
-            <div class="doc-content my-5 text-[15pt] leading-[1.85] text-justify" style="text-indent: 2.5cm;">
+            <div class="doc-content my-4 text-[15pt] leading-[1.85] text-justify">
               ${contentHtml}
             </div>
 
@@ -5970,7 +6675,7 @@ class MemoApp {
 
     let scale = availableWidth / a4StandardWidth;
     if (scale > 1.15) scale = 1.15;
-    if (scale < 0.45) scale = 0.45;
+    if (scale < 0.32) scale = 0.32;
 
     this.setPreviewScale(Math.round(scale * 100) / 100, true);
   }
@@ -6053,6 +6758,7 @@ class MemoApp {
     const salaryAmount = parseFloat(document.getElementById('form-emp-salary').value) || 0;
     const salaryText = document.getElementById('form-emp-salary-text').value.trim();
     const certPurpose = document.getElementById('form-emp-purpose').value.trim();
+    const showFooter = document.getElementById('form-show-footer-toggle')?.checked ?? false;
 
     return {
       companyId: compId,
@@ -6079,6 +6785,7 @@ class MemoApp {
       salaryAmount,
       salaryText,
       certPurpose,
+      showFooter,
       attachments: this.currentAttachments ? [...this.currentAttachments] : [],
       docNumber: this.currentIssuedDocNumber || ''
     };
@@ -6215,6 +6922,10 @@ class MemoApp {
 
     const deleteBtnText = document.getElementById('btn-delete-doc-text');
     if (deleteBtnText) deleteBtnText.textContent = 'ลบเอกสารฉบับนี้ทิ้ง';
+
+    // Clear Autosave Draft
+    window.storage.clearAutosaveDraft();
+    document.getElementById('autosave-restore-banner')?.classList.add('hidden');
 
     // Auto-sync to Google Sheet / Drive if configured
     const settings = window.storage.getSettings();
@@ -6436,6 +7147,10 @@ class MemoApp {
 
     const deleteBtnText = document.getElementById('btn-delete-doc-text');
     if (deleteBtnText) deleteBtnText.textContent = 'ลบเอกสารฉบับนี้ทิ้ง';
+
+    // Clear Autosave Draft
+    window.storage.clearAutosaveDraft();
+    document.getElementById('autosave-restore-banner')?.classList.add('hidden');
 
     this.showToast('บันทึกฉบับร่างสำเร็จ', 'success');
   }
@@ -7643,6 +8358,344 @@ class MemoApp {
   }
 
   // =========================================================================
+  // Template & Past Memo Import with Live Preview
+  // =========================================================================
+  openTemplateImportModal() {
+    this.currentImportTab = 'templates';
+    this.selectedImportId = null;
+    this.selectedImportType = null;
+    this.updateImportTabsUI();
+    this.renderImportItemsList();
+    this.openModal('template-import-modal');
+
+    // Auto-select first template
+    const tpls = window.storage.getTemplates();
+    if (tpls && tpls.length > 0) {
+      this.selectImportItem('template', tpls[0].id);
+    }
+  }
+
+  switchImportTab(tab) {
+    this.currentImportTab = tab;
+    this.updateImportTabsUI();
+    this.renderImportItemsList();
+    if (tab === 'templates') {
+      const tpls = window.storage.getTemplates();
+      if (tpls && tpls.length > 0) this.selectImportItem('template', tpls[0].id);
+    } else {
+      const docs = window.storage.getDocuments().filter(d => d.docType === 'memo' || !d.docType);
+      if (docs && docs.length > 0) this.selectImportItem('memo', docs[0].id);
+      else this.renderEmptyImportPreview();
+    }
+  }
+
+  updateImportTabsUI() {
+    const tabTpl = document.getElementById('tab-import-templates');
+    const tabPast = document.getElementById('tab-import-past-memos');
+    if (this.currentImportTab === 'templates') {
+      tabTpl?.classList.add('border-sky-600', 'text-sky-600');
+      tabTpl?.classList.remove('border-transparent', 'text-slate-500');
+      tabPast?.classList.remove('border-sky-600', 'text-sky-600');
+      tabPast?.classList.add('border-transparent', 'text-slate-500');
+    } else {
+      tabPast?.classList.add('border-sky-600', 'text-sky-600');
+      tabPast?.classList.remove('border-transparent', 'text-slate-500');
+      tabTpl?.classList.remove('border-sky-600', 'text-sky-600');
+      tabTpl?.classList.add('border-transparent', 'text-slate-500');
+    }
+  }
+
+  renderImportItemsList() {
+    const container = document.getElementById('template-items-scroll-list');
+    const search = document.getElementById('template-search-input')?.value.toLowerCase().trim() || '';
+    if (!container) return;
+
+    if (this.currentImportTab === 'templates') {
+      let tpls = window.storage.getTemplates();
+      if (search) {
+        tpls = tpls.filter(t => t.name.toLowerCase().includes(search) || (t.category && t.category.toLowerCase().includes(search)) || (t.subject && t.subject.toLowerCase().includes(search)));
+      }
+      if (tpls.length === 0) {
+        container.innerHTML = `<div class="p-6 text-center text-xs text-slate-400">ไม่พบแม่แบบที่ค้นหา</div>`;
+        return;
+      }
+      container.innerHTML = tpls.map(t => `
+        <div class="template-item-card ${this.selectedImportId === t.id ? 'active' : ''}" data-type="template" data-id="${t.id}" onclick="window.app.selectImportItem('template', '${t.id}')">
+          <div class="flex items-start gap-2.5">
+            <span class="text-xl shrink-0">${t.icon || '📄'}</span>
+            <div class="min-w-0 flex-1">
+              <span class="text-[10px] font-bold text-sky-700 bg-sky-100/80 px-1.5 py-0.5 rounded">${t.category}</span>
+              <h5 class="text-xs font-bold text-slate-800 mt-1 truncate">${t.name}</h5>
+              <p class="text-[11px] text-slate-500 truncate mt-0.5">${t.subject}</p>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    } else {
+      let docs = window.storage.getDocuments();
+      if (search) {
+        docs = docs.filter(d => (d.subject && d.subject.toLowerCase().includes(search)) || (d.docNumber && d.docNumber.toLowerCase().includes(search)));
+      }
+      if (docs.length === 0) {
+        container.innerHTML = `<div class="p-6 text-center text-xs text-slate-400">ไม่พบบันทึกข้อความเดิม</div>`;
+        return;
+      }
+      container.innerHTML = docs.map(d => {
+        const comp = window.storage.getCompany(d.companyId);
+        return `
+          <div class="template-item-card ${this.selectedImportId === d.id ? 'active' : ''}" data-type="memo" data-id="${d.id}" onclick="window.app.selectImportItem('memo', '${d.id}')">
+            <div class="flex items-start gap-2.5">
+              <span class="text-xl shrink-0">📑</span>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded font-mono">${d.docNumber || 'ฉบับร่าง'}</span>
+                  <span class="text-[10px] text-slate-400">${d.date || ''}</span>
+                </div>
+                <h5 class="text-xs font-bold text-slate-800 mt-1 truncate">${d.subject || 'ไม่ระบุชื่อเรื่อง'}</h5>
+                <p class="text-[11px] text-slate-500 truncate mt-0.5">${comp ? comp.name : ''}</p>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  selectImportItem(type, id) {
+    this.selectedImportType = type;
+    this.selectedImportId = id;
+
+    // Highlight in left list
+    document.querySelectorAll('.template-item-card').forEach(card => {
+      if (card.dataset.id === id && card.dataset.type === type) {
+        card.classList.add('active');
+      } else {
+        card.classList.remove('active');
+      }
+    });
+
+    const previewTarget = document.getElementById('template-preview-container');
+    const tip = document.getElementById('template-preview-status-tip');
+    if (!previewTarget) return;
+
+    if (type === 'template') {
+      const tpl = window.storage.getTemplate(id);
+      if (!tpl) return;
+      if (tip) tip.textContent = `กำลังแสดงตัวอย่างแม่แบบ: "${tpl.name}"`;
+
+      const comp = window.storage.getCompany(this.activeCompanyId) || window.storage.getCompanies()[0];
+      const mockDoc = {
+        companyId: comp.id,
+        docType: 'memo',
+        headerTitle: 'บันทึกภายใน',
+        date: new Date().toISOString().split('T')[0],
+        subject: tpl.subject,
+        toRecipient: tpl.toRecipient,
+        closing: tpl.closing,
+        content: tpl.content,
+        signerName: document.getElementById('form-signer-name-input')?.value.trim() || 'นิพนธ์ ศรแก้ว',
+        signerPosition: document.getElementById('form-signer-position-select')?.value || 'ผู้จัดการทั่วไป',
+        showFooter: false
+      };
+      previewTarget.innerHTML = this.buildDocHtml(mockDoc);
+    } else {
+      const doc = window.storage.getDocument(id);
+      if (!doc) return;
+      if (tip) tip.textContent = `กำลังแสดงตัวอย่างบันทึกเดิม: "${doc.docNumber || 'ฉบับร่าง'}" - ${doc.subject}`;
+      previewTarget.innerHTML = this.buildDocHtml(doc);
+    }
+  }
+
+  renderEmptyImportPreview() {
+    const previewTarget = document.getElementById('template-preview-container');
+    if (previewTarget) {
+      previewTarget.innerHTML = `<div class="p-12 text-center text-slate-400">ยังไม่มีบันทึกเดิมในระบบ</div>`;
+    }
+  }
+
+  applyImportContentOnly() {
+    if (!this.selectedImportId || !this.selectedImportType) {
+      this.showToast('กรุณาเลือกรายการที่ต้องการนำเข้าก่อน', 'warning');
+      return;
+    }
+    let content = '';
+    if (this.selectedImportType === 'template') {
+      const tpl = window.storage.getTemplate(this.selectedImportId);
+      if (tpl) content = tpl.content;
+    } else {
+      const doc = window.storage.getDocument(this.selectedImportId);
+      if (doc) content = doc.content;
+    }
+
+    if (!content) {
+      this.showToast('ไม่พบเนื้อหาในรายการที่เลือก', 'warning');
+      return;
+    }
+
+    const editor = document.getElementById('rich-content-editor');
+    if (editor) {
+      const current = editor.innerHTML.trim();
+      if (!current || current === '<p>มีความประสงค์ขออนุมัติดำเนินการ...</p>' || current === '<p><br></p>') {
+        editor.innerHTML = content;
+      } else {
+        editor.innerHTML = current + '<br>' + content;
+      }
+    }
+
+    this.closeModal('template-import-modal');
+    this.updateLivePreview();
+    this.showToast('แทรกเนื้อหาและตารางสำเร็จแล้ว', 'success');
+  }
+
+  applyImportFull() {
+    if (!this.selectedImportId || !this.selectedImportType) {
+      this.showToast('กรุณาเลือกรายการที่ต้องการนำเข้าก่อน', 'warning');
+      return;
+    }
+
+    if (this.selectedImportType === 'template') {
+      const tpl = window.storage.getTemplate(this.selectedImportId);
+      if (!tpl) return;
+      document.getElementById('form-subject-input').value = tpl.subject || '';
+      if (tpl.toRecipient) {
+        const recSelect = document.getElementById('form-recipient-select');
+        if (recSelect) {
+          let matched = false;
+          for (let opt of recSelect.options) {
+            if (opt.value === tpl.toRecipient) {
+              recSelect.value = tpl.toRecipient;
+              matched = true;
+              break;
+            }
+          }
+          if (!matched) {
+            recSelect.value = '__custom__';
+            const cust = document.getElementById('form-recipient-custom');
+            if (cust) {
+              cust.value = tpl.toRecipient;
+              document.getElementById('form-recipient-custom-group')?.classList.remove('hidden');
+            }
+          }
+        }
+      }
+      if (tpl.closing) {
+        const closeSelect = document.getElementById('form-closing-select');
+        if (closeSelect) {
+          let matched = false;
+          for (let opt of closeSelect.options) {
+            if (opt.value === tpl.closing) {
+              closeSelect.value = tpl.closing;
+              matched = true;
+              break;
+            }
+          }
+          if (!matched) {
+            closeSelect.value = '__custom__';
+            const cust = document.getElementById('form-closing-custom');
+            if (cust) {
+              cust.value = tpl.closing;
+              document.getElementById('form-closing-custom-group')?.classList.remove('hidden');
+            }
+          }
+        }
+      }
+      const editor = document.getElementById('rich-content-editor');
+      if (editor) editor.innerHTML = tpl.content || '';
+    } else {
+      const doc = window.storage.getDocument(this.selectedImportId);
+      if (!doc) return;
+      document.getElementById('form-subject-input').value = doc.subject || '';
+      if (doc.toRecipient) {
+        const recSelect = document.getElementById('form-recipient-select');
+        if (recSelect) recSelect.value = doc.toRecipient;
+      }
+      if (doc.closing) {
+        const closeSelect = document.getElementById('form-closing-select');
+        if (closeSelect) closeSelect.value = doc.closing;
+      }
+      if (doc.signerName) {
+        document.getElementById('form-signer-name-input').value = doc.signerName;
+      }
+      if (doc.signerPosition) {
+        document.getElementById('form-signer-position-select').value = doc.signerPosition;
+      }
+      const editor = document.getElementById('rich-content-editor');
+      if (editor) editor.innerHTML = doc.content || '';
+    }
+
+    this.closeModal('template-import-modal');
+    this.updateLivePreview();
+    this.showToast('นำเข้าข้อมูลสำเร็จแล้ว', 'success');
+  }
+
+  // =========================================================================
+  // Editor Formatting, Table & Image Insertion Helpers
+  // =========================================================================
+  insertTableToEditor() {
+    const tableHtml = `
+      <table style="width:100%; border-collapse:collapse; margin:14px 0;">
+        <thead>
+          <tr style="background:#f1f5f9;">
+            <th style="border:1px solid #cbd5e1; padding:8px; text-align:center; width:50px;">ลำดับ</th>
+            <th style="border:1px solid #cbd5e1; padding:8px; text-align:left;">รายการ / รายละเอียด</th>
+            <th style="border:1px solid #cbd5e1; padding:8px; text-align:center; width:80px;">จำนวน</th>
+            <th style="border:1px solid #cbd5e1; padding:8px; text-align:right; width:110px;">ราคา/หน่วย</th>
+            <th style="border:1px solid #cbd5e1; padding:8px; text-align:right; width:120px;">ราคารวม (บาท)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">1</td>
+            <td style="border:1px solid #cbd5e1; padding:8px;">ระบุรายการที่ต้องการ...</td>
+            <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">1</td>
+            <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">0.00</td>
+            <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">0.00</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">2</td>
+            <td style="border:1px solid #cbd5e1; padding:8px;">ระบุรายการที่ต้องการ...</td>
+            <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">1</td>
+            <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">0.00</td>
+            <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">0.00</td>
+          </tr>
+          <tr style="font-weight:bold; background:#f8fafc;">
+            <td colspan="4" style="border:1px solid #cbd5e1; padding:8px; text-align:right;">รวมเป็นเงินทั้งสิ้น</td>
+            <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">0.00</td>
+          </tr>
+        </tbody>
+      </table><p></p>
+    `;
+    document.execCommand('insertHTML', false, tableHtml);
+    this.updateLivePreview();
+  }
+
+  async handleEditorImageUpload(file) {
+    if (!file) return;
+    try {
+      const compressed = await window.Utils.compressImage(file, 800, 0.85);
+      const imgHtml = `<p><img src="${compressed}" style="max-width:100%; height:auto; border-radius:4px; margin:12px auto; display:block;" alt="ภาพประกอบ"></p><p></p>`;
+      document.execCommand('insertHTML', false, imgHtml);
+      this.updateLivePreview();
+      this.showToast('แทรกรูปภาพเรียบร้อยแล้ว', 'success');
+    } catch (err) {
+      this.showToast('ไม่สามารถแทรกรูปภาพได้: ' + err.message, 'error');
+    }
+  }
+
+  cleanEditorFormatting() {
+    const editor = document.getElementById('rich-content-editor');
+    if (!editor) return;
+    let html = editor.innerHTML;
+    html = html.replace(/<span[^>]*>/gi, '').replace(/<\/span>/gi, '');
+    html = html.replace(/font-family:[^;]+;/gi, '');
+    html = html.replace(/font-size:[^;]+;/gi, '');
+    html = html.replace(/color:[^;]+;/gi, '');
+    editor.innerHTML = html;
+    this.updateLivePreview();
+    this.showToast('ล้างฟอร์แมตแปลกปลอมเรียบร้อยแล้ว', 'info');
+  }
+
+  // =========================================================================
   // Modal Helpers
   // =========================================================================
   openModal(modalId) {
@@ -7705,12 +8758,58 @@ class MemoApp {
     document.querySelectorAll('.nav-item').forEach(el => {
       el.addEventListener('click', () => {
         const view = el.dataset.view;
-        if (view === 'editor') {
-          this.resetEditorForm();
+        if (window.innerWidth < 1024) {
+          document.getElementById('sidebar')?.classList.remove('mobile-open');
         }
         if (view) this.navigateTo(view);
       });
     });
+
+    // Company Settings Collapsible Header Toggle
+    document.getElementById('btn-toggle-company-settings')?.addEventListener('click', () => {
+      const content = document.getElementById('company-settings-content');
+      const chevron = document.getElementById('company-settings-chevron');
+      const badge = document.getElementById('company-settings-badge');
+      if (content) {
+        const isHidden = content.classList.contains('hidden');
+        if (isHidden) {
+          content.classList.remove('hidden');
+          chevron?.classList.add('rotate-180');
+          if (badge) badge.textContent = 'ซ่อนรายละเอียด';
+        } else {
+          content.classList.add('hidden');
+          chevron?.classList.remove('rotate-180');
+          if (badge) badge.textContent = 'แก้ไขโลโก้/ที่อยู่';
+        }
+      }
+    });
+
+    // Footer Toggle Live Refresh
+    document.getElementById('form-show-footer-toggle')?.addEventListener('change', () => {
+      this.updateLivePreview();
+    });
+
+    // Template & Past Memo Import Modal
+    document.getElementById('btn-open-template-import')?.addEventListener('click', () => this.openTemplateImportModal());
+    document.getElementById('tab-import-templates')?.addEventListener('click', () => this.switchImportTab('templates'));
+    document.getElementById('tab-import-past-memos')?.addEventListener('click', () => this.switchImportTab('past-memos'));
+    document.getElementById('template-search-input')?.addEventListener('input', () => this.renderImportItemsList());
+    document.getElementById('btn-apply-import-content-only')?.addEventListener('click', () => this.applyImportContentOnly());
+    document.getElementById('btn-apply-import-full')?.addEventListener('click', () => this.applyImportFull());
+
+    // Editor Table & Inline Image & Format Tools
+    document.getElementById('btn-editor-insert-table')?.addEventListener('click', () => this.insertTableToEditor());
+    document.getElementById('editor-image-file-input')?.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) {
+        this.handleEditorImageUpload(e.target.files[0]);
+        e.target.value = '';
+      }
+    });
+    document.getElementById('btn-editor-clean-format')?.addEventListener('click', () => this.cleanEditorFormatting());
+
+    // Autosave Draft Banner Action Buttons
+    document.getElementById('btn-restore-autosave-draft')?.addEventListener('click', () => this.restoreAutosaveDraft());
+    document.getElementById('btn-dismiss-autosave-draft')?.addEventListener('click', () => this.dismissAutosaveDraft());
 
     // Sidebar Togglers (Top, Icon, Bottom, Topbar)
     document.getElementById('sidebar-toggle-btn')?.addEventListener('click', () => this.toggleSidebar());
@@ -7896,6 +8995,13 @@ class MemoApp {
 
     // Topbar Quick Actions
     document.getElementById('btn-quick-new-doc')?.addEventListener('click', () => {
+      if (this.hasUserEditedForm()) {
+        const ok = confirm('คุณมีเนื้อหาที่กำลังพิมพ์อยู่ ต้องการล้างเพื่อเริ่มเอกสารใหม่หรือไม่?');
+        if (!ok) {
+          this.navigateTo('editor');
+          return;
+        }
+      }
       this.resetEditorForm();
       this.navigateTo('editor');
     });
@@ -7933,8 +9039,8 @@ class MemoApp {
     });
 
     document.getElementById('btn-zoom-out')?.addEventListener('click', () => {
-      if (this.currentZoom > 0.45) {
-        this.setPreviewScale(Math.max(this.currentZoom - 0.1, 0.45), false);
+      if (this.currentZoom > 0.32) {
+        this.setPreviewScale(Math.max(this.currentZoom - 0.08, 0.32), false);
       }
     });
 

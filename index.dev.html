@@ -497,9 +497,9 @@
                 <!-- Injected by JS -->
               </div>
               <!-- Button to Collapse Form and give 100% width to preview -->
-              <button type="button" id="btn-collapse-form-panel" class="p-2 rounded-xl bg-slate-100/90 hover:bg-slate-200 text-slate-700 hover:text-slate-900 transition flex items-center gap-1.5 text-xs font-semibold cursor-pointer border border-slate-200" title="ย่อฟอร์มเพื่อขยายพรีวิวเอกสารเต็มจอ">
-                <i data-lucide="chevrons-left" class="w-4 h-4"></i>
-                <span class="hidden sm:inline">ย่อฟอร์ม</span>
+              <button type="button" id="btn-collapse-form-panel" class="px-2.5 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 hover:text-sky-900 transition flex items-center gap-1.5 text-xs font-semibold cursor-pointer border border-sky-200" title="ย่อฟอร์มเพื่อขยายพรีวิวเอกสารเต็มจอ">
+                <i data-lucide="eye" class="w-4 h-4 text-sky-600"></i>
+                <span class="inline text-[11px] font-bold text-sky-800">ดูพรีวิว A4</span>
               </button>
             </div>
           </div>
@@ -545,6 +545,27 @@
           <!-- Form Fields Container -->
           <form id="doc-editor-form" class="p-5 space-y-4" onsubmit="return false;">
             
+            <!-- Autosave Recovery Banner (ตรวจจับดราฟต์เดิมอัตโนมัติ) -->
+            <div id="autosave-restore-banner" class="hidden">
+              <div class="flex items-center gap-2.5">
+                <div class="p-1.5 bg-blue-100 text-blue-700 rounded-lg">
+                  <i data-lucide="history" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <p class="text-xs font-bold text-blue-900">ตรวจพบฉบับร่างที่บันทึกไว้ในเบราว์เซอร์</p>
+                  <p id="autosave-draft-time" class="text-[11px] text-blue-700">มีเนื้อหาที่ยังไม่ได้บันทึกเสร็จสิ้น</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <button type="button" id="btn-restore-autosave-draft" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-xs transition cursor-pointer">
+                  กู้คืนร่างเดิม
+                </button>
+                <button type="button" id="btn-dismiss-autosave-draft" class="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-600 text-xs font-medium rounded-lg border border-slate-200 transition cursor-pointer">
+                  ลบและเริ่มใหม่
+                </button>
+              </div>
+            </div>
+
             <!-- Company & Doc Type Selectors -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
@@ -581,67 +602,72 @@
               </div>
             </div>
 
-            <!-- Company Branding, Logo & Tax ID Controls (แก้ไขได้ทันที) -->
-            <div class="p-3.5 bg-sky-50/60 rounded-xl border border-sky-200/80 space-y-3">
-              <div class="flex items-center justify-between">
+            <!-- Company Branding, Logo & Tax ID Controls (พับเก็บได้ เพื่อไม่ให้เกะกะสายตา) -->
+            <div class="p-3.5 bg-sky-50/60 rounded-xl border border-sky-200/80">
+              <div class="flex items-center justify-between cursor-pointer select-none" id="btn-toggle-company-settings">
                 <h4 class="text-xs font-bold text-sky-950 uppercase tracking-wider flex items-center gap-1.5">
                   <i data-lucide="building-2" class="w-4 h-4 text-sky-600"></i>
                   หัวเอกสาร, โลโก้ &amp; ข้อมูลหน่วยงาน
                 </h4>
-                <span class="text-[10px] text-sky-700 bg-sky-100 px-2 py-0.5 rounded font-semibold">ปรับแต่งได้</span>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] text-sky-700 bg-sky-100 px-2 py-0.5 rounded font-semibold" id="company-settings-badge">แก้ไขโลโก้/ที่อยู่</span>
+                  <i data-lucide="chevron-down" id="company-settings-chevron" class="w-4 h-4 text-sky-700 transition-transform duration-200"></i>
+                </div>
               </div>
 
-              <!-- Logo Preview & Custom Upload -->
-              <div class="flex items-center gap-3 bg-white p-2.5 rounded-lg border border-slate-200">
-                <div class="w-16 h-12 bg-slate-50 rounded border border-slate-200 flex items-center justify-center p-1 shrink-0 overflow-hidden">
-                  <img id="form-logo-preview" src="assets/images/twp_logo.png" alt="Logo Preview" class="max-h-full max-w-full object-contain">
-                </div>
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-2">
-                    <label class="text-xs bg-sky-600 hover:bg-sky-700 text-white px-2.5 py-1 rounded-md font-semibold cursor-pointer shadow-xs transition inline-flex items-center gap-1">
-                      <i data-lucide="upload" class="w-3.5 h-3.5"></i>
-                      <span>เปลี่ยนโลโก้</span>
-                      <input type="file" id="form-logo-file-input" accept="image/*" class="hidden">
-                    </label>
-                    <button type="button" id="btn-reset-company-logo" class="text-xs text-slate-500 hover:text-slate-800 underline">
-                      ใช้โลโก้เดิม
-                    </button>
+              <div id="company-settings-content" class="space-y-3 mt-3 hidden">
+                <!-- Logo Preview & Custom Upload -->
+                <div class="flex items-center gap-3 bg-white p-2.5 rounded-lg border border-slate-200">
+                  <div class="w-16 h-12 bg-slate-50 rounded border border-slate-200 flex items-center justify-center p-1 shrink-0 overflow-hidden">
+                    <img id="form-logo-preview" src="assets/images/twp_logo.png" alt="Logo Preview" class="max-h-full max-w-full object-contain">
                   </div>
-                  <p class="text-[10px] text-slate-400 mt-0.5">เปลี่ยนรูปโลโก้หัวเอกสารได้ทันที (PNG, SVG, JPG)</p>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2">
+                      <label class="text-xs bg-sky-600 hover:bg-sky-700 text-white px-2.5 py-1 rounded-md font-semibold cursor-pointer shadow-xs transition inline-flex items-center gap-1">
+                        <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                        <span>เปลี่ยนโลโก้</span>
+                        <input type="file" id="form-logo-file-input" accept="image/*" class="hidden">
+                      </label>
+                      <button type="button" id="btn-reset-company-logo" class="text-xs text-slate-500 hover:text-slate-800 underline">
+                        ใช้โลโก้เดิม
+                      </button>
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-0.5">เปลี่ยนรูปโลโก้หัวเอกสารได้ทันที (PNG, SVG, JPG)</p>
+                  </div>
                 </div>
-              </div>
 
-              <!-- Company Name & Tax ID -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                <div>
-                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">ชื่อหัวเอกสาร / บริษัท</label>
-                  <input type="text" id="form-company-name-input" placeholder="ชื่อบริษัท..." class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none font-medium text-slate-800">
+                <!-- Company Name & Tax ID -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-700 mb-1">ชื่อหัวเอกสาร / บริษัท</label>
+                    <input type="text" id="form-company-name-input" placeholder="ชื่อบริษัท..." class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none font-medium text-slate-800">
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-700 mb-1">เลขประจำตัวผู้เสียภาษี (แสดงที่ Footer)</label>
+                    <input type="text" id="form-company-taxid-input" placeholder="เลขผู้เสียภาษี 13 หลัก..." class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none font-mono text-slate-800">
+                  </div>
                 </div>
-                <div>
-                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">เลขประจำตัวผู้เสียภาษี (แสดงที่ Footer)</label>
-                  <input type="text" id="form-company-taxid-input" placeholder="เลขผู้เสียภาษี 13 หลัก..." class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none font-mono text-slate-800">
-                </div>
-              </div>
 
-              <!-- Tel & Address (to show in footer) -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                <div>
-                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">เบอร์โทรศัพท์ (แสดงที่ Footer)</label>
-                  <input type="text" id="form-company-tel-input" placeholder="เบอร์โทรศัพท์..." class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                <!-- Tel & Address (to show in footer) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-700 mb-1">เบอร์โทรศัพท์ (แสดงที่ Footer)</label>
+                    <input type="text" id="form-company-tel-input" placeholder="เบอร์โทรศัพท์..." class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-semibold text-slate-700 mb-1">ที่อยู่ (แสดงที่ Footer)</label>
+                    <input type="text" id="form-company-address-input" placeholder="ที่อยู่บริษัท..." class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                  </div>
                 </div>
-                <div>
-                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">ที่อยู่ (แสดงที่ Footer)</label>
-                  <input type="text" id="form-company-address-input" placeholder="ที่อยู่บริษัท..." class="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none">
-                </div>
-              </div>
 
-              <!-- Save Company Defaults Button (ใช้ได้ตลอดไปจนกว่าจะแก้ไข) -->
-              <div class="pt-2.5 border-t border-sky-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <span class="text-[11px] text-slate-500">บันทึกโลโก้และข้อมูลนี้ใช้ตลอดไป:</span>
-                <button type="button" id="btn-save-company-defaults" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg font-semibold flex items-center justify-center gap-1.5 shadow-xs transition cursor-pointer" title="บันทึกข้อมูลและโลโก้เป็นค่าเริ่มต้นของบริษัทเพื่อใช้ตลอดไป">
-                  <i data-lucide="check" class="w-3.5 h-3.5"></i>
-                  <span>บันทึกเป็นค่าเริ่มต้นของบริษัทนี้</span>
-                </button>
+                <!-- Save Company Defaults Button (ใช้ได้ตลอดไปจนกว่าจะแก้ไข) -->
+                <div class="pt-2.5 border-t border-sky-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <span class="text-[11px] text-slate-500">บันทึกโลโก้และข้อมูลนี้ใช้ตลอดไป:</span>
+                  <button type="button" id="btn-save-company-defaults" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg font-semibold flex items-center justify-center gap-1.5 shadow-xs transition cursor-pointer" title="บันทึกข้อมูลและโลโก้เป็นค่าเริ่มต้นของบริษัทเพื่อใช้ตลอดไป">
+                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                    <span>บันทึกเป็นค่าเริ่มต้นของบริษัทนี้</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -658,18 +684,7 @@
               </div>
             </div>
 
-            <!-- Recipient ("เรียน") Section -->
-            <div id="memo-recipient-fields" class="space-y-2">
-              <label class="block text-xs font-semibold text-slate-700">เรียน (ถึงใคร)</label>
-              <select id="form-recipient-select" class="w-full text-sm bg-slate-50 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-sky-500 focus:outline-none">
-                <!-- Populated by JS -->
-              </select>
-              <div id="form-recipient-custom-group" class="hidden">
-                <input type="text" id="form-recipient-custom" placeholder="ระบุชื่อหรือตำแหน่งผู้รับ..." class="w-full text-sm bg-amber-50/50 border border-amber-300 rounded-lg p-2 focus:ring-2 focus:ring-amber-500 focus:outline-none">
-              </div>
-            </div>
-
-            <!-- Subject ("เรื่อง") with Autocomplete & Quick Chips -->
+            <!-- Subject ("เรื่อง") FIRST: Standard Thai Corporate Protocol -->
             <div class="space-y-2">
               <div class="flex items-center justify-between">
                 <label class="block text-xs font-semibold text-slate-700">เรื่อง (หัวข้อเอกสาร)</label>
@@ -684,6 +699,17 @@
                 <div id="subject-chips-container" class="flex flex-wrap gap-1.5">
                   <!-- Injected by JS -->
                 </div>
+              </div>
+            </div>
+
+            <!-- Recipient ("เรียน") Section: Follows Subject -->
+            <div id="memo-recipient-fields" class="space-y-2">
+              <label class="block text-xs font-semibold text-slate-700">เรียน (ถึงใคร)</label>
+              <select id="form-recipient-select" class="w-full text-sm bg-slate-50 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                <!-- Populated by JS -->
+              </select>
+              <div id="form-recipient-custom-group" class="hidden">
+                <input type="text" id="form-recipient-custom" placeholder="ระบุชื่อหรือตำแหน่งผู้รับ..." class="w-full text-sm bg-amber-50/50 border border-amber-300 rounded-lg p-2 focus:ring-2 focus:ring-amber-500 focus:outline-none">
               </div>
             </div>
 
@@ -736,11 +762,19 @@
               </div>
             </div>
 
-            <!-- Content Area (Rich Text) -->
+            <!-- Content Area (Rich Text) with Smart Toolbar -->
             <div class="space-y-1.5">
-              <label class="block text-xs font-semibold text-slate-700">เนื้อหาเอกสาร (ไม่จำกัดจำนวนคำ)</label>
-              <!-- Simple Formatting Toolbar -->
-              <div class="flex items-center gap-1 p-1.5 bg-slate-100 rounded-t-lg border border-slate-300 border-b-0">
+              <div class="flex items-center justify-between">
+                <label class="block text-xs font-semibold text-slate-700">เนื้อหาเอกสาร (ไม่จำกัดจำนวนคำ)</label>
+                <!-- Quick Template & External Data Import Button -->
+                <button type="button" id="btn-open-template-import" class="px-2.5 py-1 rounded-lg bg-sky-100 hover:bg-sky-200 text-sky-800 text-[11px] font-bold flex items-center gap-1.5 transition cursor-pointer shadow-xs border border-sky-300/70" title="เลือกแม่แบบสำเร็จรูปที่มีตาราง หรือคัดลอกจากบันทึกเดิม">
+                  <i data-lucide="layers" class="w-3.5 h-3.5 text-sky-600"></i>
+                  <span>📥 คลังแม่แบบ &amp; ดึงข้อมูลเดิม</span>
+                </button>
+              </div>
+
+              <!-- Formatting & Object Toolbar -->
+              <div class="flex flex-wrap items-center gap-1 p-1.5 bg-slate-100 rounded-t-lg border border-slate-300 border-b-0">
                 <button type="button" data-cmd="bold" class="editor-tool-btn p-1.5 rounded hover:bg-white text-slate-700 text-xs font-bold" title="ตัวหนา"><b>B</b></button>
                 <button type="button" data-cmd="italic" class="editor-tool-btn p-1.5 rounded hover:bg-white text-slate-700 text-xs italic" title="ตัวเอียง"><i>I</i></button>
                 <button type="button" data-cmd="underline" class="editor-tool-btn p-1.5 rounded hover:bg-white text-slate-700 text-xs underline" title="ขีดเส้นใต้"><u>U</u></button>
@@ -750,6 +784,20 @@
                 <span class="w-px h-4 bg-slate-300 mx-1"></span>
                 <button type="button" data-cmd="justifyLeft" class="editor-tool-btn p-1.5 rounded hover:bg-white text-slate-700 text-xs" title="ชิดซ้าย"><i data-lucide="align-left" class="w-3.5 h-3.5"></i></button>
                 <button type="button" data-cmd="justifyFull" class="editor-tool-btn p-1.5 rounded hover:bg-white text-slate-700 text-xs" title="กระจายเต็มบรรทัด"><i data-lucide="align-justify" class="w-3.5 h-3.5"></i></button>
+                <span class="w-px h-4 bg-slate-300 mx-1"></span>
+                <!-- Insert Table & Inline Image -->
+                <button type="button" id="btn-editor-insert-table" class="p-1.5 rounded hover:bg-white text-sky-700 text-xs font-semibold flex items-center gap-1" title="แทรกตารางรายการ/งบประมาณ">
+                  <i data-lucide="table" class="w-3.5 h-3.5"></i>
+                  <span>แทรกตาราง</span>
+                </button>
+                <label id="btn-editor-insert-image" class="p-1.5 rounded hover:bg-white text-sky-700 text-xs font-semibold flex items-center gap-1 cursor-pointer" title="แทรกรูปภาพประกอบในเนื้อหา">
+                  <i data-lucide="image" class="w-3.5 h-3.5"></i>
+                  <span>แทรกรูปภาพ</span>
+                  <input type="file" id="editor-image-file-input" accept="image/*" class="hidden">
+                </label>
+                <button type="button" id="btn-editor-clean-format" class="p-1.5 rounded hover:bg-white text-slate-500 hover:text-slate-800 text-xs" title="ล้างฟอนต์หรือสไตล์แปลกปลอมที่ติดมาจากการ Copy ข้อความจากภายนอก">
+                  <i data-lucide="remove-formatting" class="w-3.5 h-3.5"></i>
+                </button>
               </div>
               <div id="rich-content-editor" contenteditable="true" class="min-h-[160px] max-h-[300px] overflow-y-auto p-3 text-sm bg-white border border-slate-300 rounded-b-lg focus:outline-none focus:ring-2 focus:ring-sky-500 leading-relaxed">
                 <!-- Rich text editable -->
@@ -765,6 +813,17 @@
               <div id="form-closing-custom-group" class="hidden">
                 <input type="text" id="form-closing-custom" placeholder="ระบุประโยคปิดท้ายเอง..." class="w-full text-sm bg-amber-50/50 border border-amber-300 rounded-lg p-2 focus:ring-2 focus:ring-amber-500 focus:outline-none">
               </div>
+            </div>
+
+            <!-- Footer Display Switch (Internal Memos default to clean) -->
+            <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl">
+              <div class="flex items-center gap-2">
+                <input type="checkbox" id="form-show-footer-toggle" class="w-4 h-4 rounded text-sky-600 focus:ring-sky-500 border-slate-300 cursor-pointer">
+                <label for="form-show-footer-toggle" class="text-xs font-semibold text-slate-700 cursor-pointer">
+                  แสดงท้ายกระดาษข้อมูลบริษัท (ที่อยู่ / เลขผู้เสียภาษี)
+                </label>
+              </div>
+              <span class="text-[10px] text-slate-400">บันทึกภายในทั่วไปจะไม่แสดงเพื่อความสะอาดเรียบร้อย</span>
             </div>
 
             <!-- Signer Name, Position & Signature Pad -->
@@ -1932,6 +1991,90 @@
           <i data-lucide="check-circle" class="w-4 h-4"></i>
           <span>ยืนยันและนำเลขนี้ไปใช้</span>
         </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL 10: TEMPLATE & DATA IMPORT MODAL (WITH LIVE PREVIEW) -->
+  <div id="template-import-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full flex flex-col overflow-hidden border border-slate-100 max-h-[92vh]">
+      
+      <!-- Modal Header -->
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-sky-50 to-indigo-50/60">
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-sky-600 text-white rounded-xl shadow-xs">
+            <i data-lucide="layers" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-800">คลังแม่แบบสำเร็จรูป &amp; ดึงข้อมูลจากบันทึกเดิม</h3>
+            <p class="text-xs text-slate-500">เลือกดูตัวอย่างพรีวิวก่อนนำเข้า หรือนำเข้าเฉพาะตาราง/เนื้อหาเพื่อความสะดวกรวดเร็วในการทำงาน</p>
+          </div>
+        </div>
+        <button type="button" onclick="window.app.closeModal('template-import-modal')" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-white rounded-xl transition cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Source Selection Tabs -->
+      <div class="flex items-center px-6 border-b border-slate-200 bg-white gap-4">
+        <button type="button" id="tab-import-templates" class="py-3 px-3 text-xs font-bold border-b-2 border-sky-600 text-sky-600 flex items-center gap-2 cursor-pointer transition">
+          <i data-lucide="layout-template" class="w-4 h-4"></i>
+          <span>แม่แบบเอกสารสำเร็จรูป (Templates)</span>
+        </button>
+        <button type="button" id="tab-import-past-memos" class="py-3 px-3 text-xs font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center gap-2 cursor-pointer transition">
+          <i data-lucide="archive" class="w-4 h-4"></i>
+          <span>คัดลอกจากบันทึกเดิมในระบบ (Past Memos)</span>
+        </button>
+      </div>
+
+      <!-- Modal Body Split View (Left: List, Right: Live Preview) -->
+      <div class="template-modal-body">
+        
+        <!-- Left: List & Search -->
+        <div class="template-list-sidebar">
+          <div class="p-3 border-b border-slate-200 bg-white">
+            <div class="relative">
+              <input type="text" id="template-search-input" placeholder="ค้นหาตามชื่อเรื่องหรือหมวดหมู่..." class="w-full text-xs pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500">
+              <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"></i>
+            </div>
+          </div>
+          
+          <div id="template-items-scroll-list" class="template-list-scroll space-y-2">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+
+        <!-- Right: Live Visual Preview -->
+        <div class="template-preview-stage">
+          <div id="template-preview-sheet" class="template-preview-sheet">
+            <div id="template-preview-container">
+              <!-- Live Preview Injected by JS -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer Action Bar -->
+      <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="text-xs text-slate-500 flex items-center gap-1.5">
+          <i data-lucide="info" class="w-4 h-4 text-sky-600"></i>
+          <span id="template-preview-status-tip">เลือกรายการทางซ้ายเพื่อดูตัวอย่างพรีวิว</span>
+        </div>
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <button type="button" onclick="window.app.closeModal('template-import-modal')" class="flex-1 sm:flex-none px-4 py-2 rounded-xl border border-slate-300 text-slate-600 text-xs font-semibold hover:bg-white transition cursor-pointer">
+            ยกเลิก
+          </button>
+          <button type="button" id="btn-apply-import-content-only" class="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer" title="แทรกเฉพาะตารางและเนื้อหาต่อจากตำแหน่งเดิม ไม่ทับหัวข้อหรือผู้รับ">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <span>แทรกเฉพาะเนื้อหา/ตาราง</span>
+          </button>
+          <button type="button" id="btn-apply-import-full" class="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white text-xs font-bold shadow-sm transition flex items-center justify-center gap-1.5 cursor-pointer" title="นำเข้าทุกช่อง: เรื่อง, เรียน, เนื้อหา, ประโยคปิดท้าย">
+            <i data-lucide="copy-check" class="w-4 h-4"></i>
+            <span>นำเข้าข้อมูลทั้งหมด</span>
+          </button>
+        </div>
       </div>
 
     </div>

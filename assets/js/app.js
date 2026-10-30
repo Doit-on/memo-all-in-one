@@ -38,6 +38,7 @@ class MemoApp {
     this.renderPresets();
     this.setupSignaturePad();
     this.initRichEditor();
+    this.initAutosave();
     
     // Default form values
     this.resetEditorForm();
@@ -257,9 +258,10 @@ class MemoApp {
     } else if (viewId === 'editor') {
       if (docId) {
         this.loadDocForEditing(docId);
-      } else if (!this.currentEditingDocId) {
+      } else if (!this.currentEditingDocId && !this.hasUserEditedForm()) {
         this.resetEditorForm();
       }
+      this.checkAutosaveDraft();
       this.updateLivePreview();
       setTimeout(() => this.autoFitPreview(), 80);
     } else if (viewId === 'archive') {
@@ -275,8 +277,15 @@ class MemoApp {
   }
 
   toggleSidebar() {
-    this.isSidebarCollapsed = !this.isSidebarCollapsed;
     const sidebar = document.getElementById('sidebar');
+    if (window.innerWidth < 1024) {
+      if (sidebar) {
+        sidebar.classList.toggle('mobile-open');
+      }
+      return;
+    }
+
+    this.isSidebarCollapsed = !this.isSidebarCollapsed;
     const labels = document.querySelectorAll('.sidebar-label');
     const logoFull = document.getElementById('sidebar-logo-full');
     const logoIcon = document.getElementById('sidebar-logo-icon');
@@ -609,6 +618,10 @@ class MemoApp {
     if (headerTitleSelect) headerTitleSelect.value = 'บันทึกภายใน';
     if (headerTitleCustom) headerTitleCustom.value = '';
 
+    // Reset Footer Toggle
+    const footerToggle = document.getElementById('form-show-footer-toggle');
+    if (footerToggle) footerToggle.checked = false;
+
     // Update delete button text
     const deleteBtnText = document.getElementById('btn-delete-doc-text');
     if (deleteBtnText) deleteBtnText.textContent = 'ล้างข้อมูล / ยกเลิก';
@@ -627,22 +640,28 @@ class MemoApp {
   loadDocForEditing(docId) {
     const doc = window.storage.getDocument(docId);
     if (!doc) return;
+    this.populateForm(doc);
+    const deleteBtnText = document.getElementById('btn-delete-doc-text');
+    if (deleteBtnText) deleteBtnText.textContent = 'ลบเอกสารฉบับนี้ทิ้ง';
+  }
 
-    this.currentEditingDocId = doc.id;
-    this.activeCompanyId = doc.companyId;
+  populateForm(doc) {
+    if (!doc) return;
+    if (doc.id) this.currentEditingDocId = doc.id;
+    this.activeCompanyId = doc.companyId || 'twp';
     this.signatureDataUrl = doc.signatureImg || '';
     this.customLogoDataUrl = doc.customLogo || '';
 
-    const comp = window.storage.getCompany(doc.companyId);
+    const comp = window.storage.getCompany(this.activeCompanyId);
 
-    document.getElementById('form-company-select').value = doc.companyId;
+    document.getElementById('form-company-select').value = this.activeCompanyId;
     document.getElementById('form-company-name-input').value = doc.customCompanyName || comp.name;
     document.getElementById('form-company-taxid-input').value = doc.customTaxId !== undefined ? doc.customTaxId : (comp.taxId || '');
     document.getElementById('form-company-tel-input').value = doc.customTel !== undefined ? doc.customTel : (comp.tel || '');
     document.getElementById('form-company-address-input').value = doc.customAddress !== undefined ? doc.customAddress : (comp.address || '');
     document.getElementById('form-logo-preview').src = this.customLogoDataUrl || comp.logo;
 
-    document.getElementById('form-doc-type').value = doc.docType;
+    document.getElementById('form-doc-type').value = doc.docType || 'memo';
     document.getElementById('form-doc-date').value = doc.date || new Date().toISOString().split('T')[0];
     document.getElementById('form-subject-input').value = doc.subject || '';
     document.getElementById('form-department-input').value = doc.department || '';
@@ -650,35 +669,41 @@ class MemoApp {
 
     // Recipient
     const recSelect = document.getElementById('form-recipient-select');
-    if ([...recSelect.options].some(o => o.value === doc.toRecipient)) {
-      recSelect.value = doc.toRecipient;
-      document.getElementById('form-recipient-custom-group').classList.add('hidden');
-    } else {
-      recSelect.value = '__custom__';
-      document.getElementById('form-recipient-custom-group').classList.remove('hidden');
-      document.getElementById('form-recipient-custom').value = doc.toRecipient || '';
+    if (recSelect) {
+      if ([...recSelect.options].some(o => o.value === doc.toRecipient)) {
+        recSelect.value = doc.toRecipient;
+        document.getElementById('form-recipient-custom-group')?.classList.add('hidden');
+      } else {
+        recSelect.value = '__custom__';
+        document.getElementById('form-recipient-custom-group')?.classList.remove('hidden');
+        document.getElementById('form-recipient-custom').value = doc.toRecipient || '';
+      }
     }
 
     // Position
     const posSelect = document.getElementById('form-signer-position-select');
-    if ([...posSelect.options].some(o => o.value === doc.signerPosition)) {
-      posSelect.value = doc.signerPosition;
-      document.getElementById('form-signer-position-custom-group').classList.add('hidden');
-    } else {
-      posSelect.value = '__custom__';
-      document.getElementById('form-signer-position-custom-group').classList.remove('hidden');
-      document.getElementById('form-signer-position-custom').value = doc.signerPosition || '';
+    if (posSelect) {
+      if ([...posSelect.options].some(o => o.value === doc.signerPosition)) {
+        posSelect.value = doc.signerPosition;
+        document.getElementById('form-signer-position-custom-group')?.classList.add('hidden');
+      } else {
+        posSelect.value = '__custom__';
+        document.getElementById('form-signer-position-custom-group')?.classList.remove('hidden');
+        document.getElementById('form-signer-position-custom').value = doc.signerPosition || '';
+      }
     }
 
     // Closing
     const closeSelect = document.getElementById('form-closing-select');
-    if ([...closeSelect.options].some(o => o.value === doc.closing)) {
-      closeSelect.value = doc.closing;
-      document.getElementById('form-closing-custom-group').classList.add('hidden');
-    } else {
-      closeSelect.value = '__custom__';
-      document.getElementById('form-closing-custom-group').classList.remove('hidden');
-      document.getElementById('form-closing-custom').value = doc.closing || '';
+    if (closeSelect) {
+      if ([...closeSelect.options].some(o => o.value === doc.closing)) {
+        closeSelect.value = doc.closing;
+        document.getElementById('form-closing-custom-group')?.classList.add('hidden');
+      } else {
+        closeSelect.value = '__custom__';
+        document.getElementById('form-closing-custom-group')?.classList.remove('hidden');
+        document.getElementById('form-closing-custom').value = doc.closing || '';
+      }
     }
 
     // Salary Cert Specific
@@ -693,7 +718,10 @@ class MemoApp {
     }
 
     // Editor content
-    document.getElementById('rich-content-editor').innerHTML = doc.content || '';
+    const editor = document.getElementById('rich-content-editor');
+    if (editor) {
+      editor.innerHTML = doc.content || '';
+    }
 
     // Document Header Title
     const headerTitleSelect = document.getElementById('form-header-title-select');
@@ -712,9 +740,11 @@ class MemoApp {
       }
     }
 
-    // Update delete button text
-    const deleteBtnText = document.getElementById('btn-delete-doc-text');
-    if (deleteBtnText) deleteBtnText.textContent = 'ลบเอกสารฉบับนี้ทิ้ง';
+    // Footer Toggle
+    const footerToggle = document.getElementById('form-show-footer-toggle');
+    if (footerToggle) {
+      footerToggle.checked = Boolean(doc.showFooter);
+    }
 
     // Restore Attachments and Issued Number State
     this.currentAttachments = (doc.attachments && Array.isArray(doc.attachments)) ? [...doc.attachments] : [];
@@ -722,9 +752,81 @@ class MemoApp {
     this.renderAttachmentsList();
     this.updateWorkflowSteps(doc.status || 'published');
 
-    this.toggleDocTypeFields(doc.docType);
+    this.toggleDocTypeFields(doc.docType || 'memo');
     this.updateNextNumberDisplay(doc.docNumber);
     this.updateLivePreview();
+  }
+
+  hasUserEditedForm() {
+    const subject = document.getElementById('form-subject-input')?.value?.trim();
+    const editor = document.getElementById('rich-content-editor');
+    const content = editor?.innerHTML?.trim() || '';
+    const isDefaultContent = !content || content === '<p>มีความประสงค์ขออนุมัติดำเนินการ...</p>' || content === '<p><br></p>';
+    const signerName = document.getElementById('form-signer-name-input')?.value?.trim();
+    const empName = document.getElementById('form-emp-name')?.value?.trim();
+    const hasAttachments = this.currentAttachments && this.currentAttachments.length > 0;
+    
+    return Boolean(subject || !isDefaultContent || signerName || empName || hasAttachments || this.currentEditingDocId);
+  }
+
+  // =========================================================================
+  // Autosave Draft Mechanics
+  // =========================================================================
+  initAutosave() {
+    this.checkAutosaveDraft();
+
+    let autosaveTimer = null;
+    const triggerAutosave = () => {
+      clearTimeout(autosaveTimer);
+      autosaveTimer = setTimeout(() => {
+        this.saveAutosaveDraft();
+      }, 1200);
+    };
+
+    const form = document.getElementById('doc-editor-form');
+    if (form) {
+      form.addEventListener('input', triggerAutosave);
+      form.addEventListener('change', triggerAutosave);
+    }
+  }
+
+  checkAutosaveDraft() {
+    const draft = window.storage.getAutosaveDraft();
+    const banner = document.getElementById('autosave-restore-banner');
+    const timeEl = document.getElementById('autosave-draft-time');
+    if (!banner) return;
+
+    if (draft && !this.currentEditingDocId && (draft.subject || (draft.content && draft.content.length > 50))) {
+      banner.classList.remove('hidden');
+      if (timeEl && draft.savedAt) {
+        const time = new Date(draft.savedAt).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+        timeEl.textContent = `ฉบับร่างบันทึกอัตโนมัติ: ${time} น. (${draft.subject || 'ยังไม่ระบุชื่อเรื่อง'})`;
+      }
+    } else {
+      banner.classList.add('hidden');
+    }
+  }
+
+  saveAutosaveDraft() {
+    if (this.currentEditingDocId) return; // Existing doc already in DB
+    if (!this.hasUserEditedForm()) return;
+    const data = this.gatherFormData(false);
+    window.storage.setAutosaveDraft(data);
+  }
+
+  restoreAutosaveDraft() {
+    const draft = window.storage.getAutosaveDraft();
+    if (!draft) return;
+    this.populateForm(draft);
+    document.getElementById('autosave-restore-banner')?.classList.add('hidden');
+    this.showToast('กู้คืนแบบร่างเดิมสำเร็จแล้ว', 'success');
+  }
+
+  dismissAutosaveDraft() {
+    window.storage.clearAutosaveDraft();
+    document.getElementById('autosave-restore-banner')?.classList.add('hidden');
+    this.resetEditorForm();
+    this.showToast('ลบแบบร่างเดิมแล้ว เริ่มต้นใหม่', 'info');
   }
 
   toggleDocTypeFields(docType) {
@@ -806,7 +908,8 @@ class MemoApp {
     }
 
     // Shared Standard Footer Component (แสดงหน่วยงาน, โทรศัพท์ และเลขผู้เสียภาษี)
-    const footerHtml = `
+    const shouldShowFooter = d.showFooter ?? (docType === 'salary_cert' || docType === 'work_cert');
+    const footerHtml = shouldShowFooter ? `
       <div class="doc-footer text-left mt-auto pt-2.5 border-t border-slate-200 text-[9.5pt] text-slate-600 leading-normal" style="font-family:'TH Sarabun New','Sarabun','Cordia New','Leelawadee UI','Tahoma',sans-serif;">
         <div>
           <span class="font-semibold text-slate-800">${compName}</span>
@@ -816,7 +919,7 @@ class MemoApp {
         ${compTaxId ? `<div>เลขประจำตัวผู้เสียภาษี: <span class="font-mono text-slate-700 font-semibold">${compTaxId}</span></div>` : ''}
         ${compAddress ? `<div class="text-slate-500">${compAddress}</div>` : ''}
       </div>
-    `;
+    ` : '';
 
     if (docType === 'memo') {
       return `
@@ -838,26 +941,30 @@ class MemoApp {
               วันที่ ${thaiDate}
             </div>
 
-            <!-- Left Metadata: เรื่อง / เรียน (and ที่ if present) -->
-            <div class="doc-meta-block mb-4 text-[15pt] leading-relaxed">
-              ${(displayDocNo && displayDocNo !== '-' && !displayDocNo.includes('(รอออกเลขที่)')) ? `
-                <div class="flex items-baseline mb-1">
-                  <span class="font-bold inline-block w-[1.8cm] shrink-0">ที่</span>
-                  <span class="font-semibold text-black">${displayDocNo}</span>
-                </div>
-              ` : ''}
-              <div class="flex items-baseline mb-1">
-                <span class="font-bold inline-block w-[1.8cm] shrink-0">เรื่อง</span>
-                <span class="font-semibold text-black">${subject}</span>
-              </div>
-              <div class="flex items-baseline">
-                <span class="font-bold inline-block w-[1.8cm] shrink-0">เรียน</span>
-                <span>${recipient}</span>
-              </div>
+            <!-- Left Metadata: ที่ / เรื่อง / เรียน using aligned 2-column table -->
+            <div class="doc-meta-block mb-3 text-[15pt]">
+              <table style="width: 100%; border: none; border-collapse: collapse; font-size: 15pt; line-height: 1.6;">
+                <tbody>
+                  ${(displayDocNo && displayDocNo !== '-' && !displayDocNo.includes('(รอออกเลขที่)')) ? `
+                    <tr>
+                      <td style="width: 1.8cm; font-weight: bold; vertical-align: top; padding: 2px 0;">ที่</td>
+                      <td style="font-weight: 600; color: #000; vertical-align: top; padding: 2px 0;">${displayDocNo}</td>
+                    </tr>
+                  ` : ''}
+                  <tr>
+                    <td style="width: 1.8cm; font-weight: bold; vertical-align: top; padding: 2px 0;">เรื่อง</td>
+                    <td style="font-weight: 600; color: #000; vertical-align: top; padding: 2px 0;">${subject}</td>
+                  </tr>
+                  <tr>
+                    <td style="width: 1.8cm; font-weight: bold; vertical-align: top; padding: 2px 0;">เรียน</td>
+                    <td style="vertical-align: top; padding: 2px 0;">${recipient}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
 
             <!-- Document Content -->
-            <div class="doc-content my-3 text-[15pt] leading-[1.75] text-justify" style="text-indent: 2.5cm;">
+            <div class="doc-content my-3 text-[15pt] leading-[1.75] text-justify">
               ${contentHtml}
             </div>
 
@@ -905,22 +1012,26 @@ class MemoApp {
               <h1 class="doc-header-title text-[22pt] font-bold text-black tracking-wide leading-tight">${headerTitle || 'ประกาศ'}</h1>
             </div>
 
-            <!-- Left Metadata: เลขที่ / เรื่อง -->
-            <div class="doc-meta-block mb-5 text-[15pt] leading-relaxed">
-              ${(displayDocNo && displayDocNo !== '-') ? `
-                <div class="flex items-baseline mb-1">
-                  <span class="font-bold inline-block w-[1.8cm] shrink-0">เลขที่</span>
-                  <span class="font-semibold text-black">${displayDocNo}</span>
-                </div>
-              ` : ''}
-              <div class="flex items-baseline">
-                <span class="font-bold inline-block w-[1.8cm] shrink-0">เรื่อง</span>
-                <span class="font-semibold text-black">${subject}</span>
-              </div>
+            <!-- Left Metadata: เลขที่ / เรื่อง using aligned 2-column table -->
+            <div class="doc-meta-block mb-4 text-[15pt]">
+              <table style="width: 100%; border: none; border-collapse: collapse; font-size: 15pt; line-height: 1.6;">
+                <tbody>
+                  ${(displayDocNo && displayDocNo !== '-') ? `
+                    <tr>
+                      <td style="width: 1.8cm; font-weight: bold; vertical-align: top; padding: 2px 0;">เลขที่</td>
+                      <td style="font-weight: 600; color: #000; vertical-align: top; padding: 2px 0;">${displayDocNo}</td>
+                    </tr>
+                  ` : ''}
+                  <tr>
+                    <td style="width: 1.8cm; font-weight: bold; vertical-align: top; padding: 2px 0;">เรื่อง</td>
+                    <td style="font-weight: 600; color: #000; vertical-align: top; padding: 2px 0;">${subject}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
 
             <!-- Document Content -->
-            <div class="doc-content my-5 text-[15pt] leading-[1.85] text-justify" style="text-indent: 2.5cm;">
+            <div class="doc-content my-4 text-[15pt] leading-[1.85] text-justify">
               ${contentHtml}
             </div>
 
@@ -1197,7 +1308,7 @@ class MemoApp {
 
     let scale = availableWidth / a4StandardWidth;
     if (scale > 1.15) scale = 1.15;
-    if (scale < 0.45) scale = 0.45;
+    if (scale < 0.32) scale = 0.32;
 
     this.setPreviewScale(Math.round(scale * 100) / 100, true);
   }
@@ -1280,6 +1391,7 @@ class MemoApp {
     const salaryAmount = parseFloat(document.getElementById('form-emp-salary').value) || 0;
     const salaryText = document.getElementById('form-emp-salary-text').value.trim();
     const certPurpose = document.getElementById('form-emp-purpose').value.trim();
+    const showFooter = document.getElementById('form-show-footer-toggle')?.checked ?? false;
 
     return {
       companyId: compId,
@@ -1306,6 +1418,7 @@ class MemoApp {
       salaryAmount,
       salaryText,
       certPurpose,
+      showFooter,
       attachments: this.currentAttachments ? [...this.currentAttachments] : [],
       docNumber: this.currentIssuedDocNumber || ''
     };
@@ -1442,6 +1555,10 @@ class MemoApp {
 
     const deleteBtnText = document.getElementById('btn-delete-doc-text');
     if (deleteBtnText) deleteBtnText.textContent = 'ลบเอกสารฉบับนี้ทิ้ง';
+
+    // Clear Autosave Draft
+    window.storage.clearAutosaveDraft();
+    document.getElementById('autosave-restore-banner')?.classList.add('hidden');
 
     // Auto-sync to Google Sheet / Drive if configured
     const settings = window.storage.getSettings();
@@ -1663,6 +1780,10 @@ class MemoApp {
 
     const deleteBtnText = document.getElementById('btn-delete-doc-text');
     if (deleteBtnText) deleteBtnText.textContent = 'ลบเอกสารฉบับนี้ทิ้ง';
+
+    // Clear Autosave Draft
+    window.storage.clearAutosaveDraft();
+    document.getElementById('autosave-restore-banner')?.classList.add('hidden');
 
     this.showToast('บันทึกฉบับร่างสำเร็จ', 'success');
   }
@@ -2870,6 +2991,344 @@ class MemoApp {
   }
 
   // =========================================================================
+  // Template & Past Memo Import with Live Preview
+  // =========================================================================
+  openTemplateImportModal() {
+    this.currentImportTab = 'templates';
+    this.selectedImportId = null;
+    this.selectedImportType = null;
+    this.updateImportTabsUI();
+    this.renderImportItemsList();
+    this.openModal('template-import-modal');
+
+    // Auto-select first template
+    const tpls = window.storage.getTemplates();
+    if (tpls && tpls.length > 0) {
+      this.selectImportItem('template', tpls[0].id);
+    }
+  }
+
+  switchImportTab(tab) {
+    this.currentImportTab = tab;
+    this.updateImportTabsUI();
+    this.renderImportItemsList();
+    if (tab === 'templates') {
+      const tpls = window.storage.getTemplates();
+      if (tpls && tpls.length > 0) this.selectImportItem('template', tpls[0].id);
+    } else {
+      const docs = window.storage.getDocuments().filter(d => d.docType === 'memo' || !d.docType);
+      if (docs && docs.length > 0) this.selectImportItem('memo', docs[0].id);
+      else this.renderEmptyImportPreview();
+    }
+  }
+
+  updateImportTabsUI() {
+    const tabTpl = document.getElementById('tab-import-templates');
+    const tabPast = document.getElementById('tab-import-past-memos');
+    if (this.currentImportTab === 'templates') {
+      tabTpl?.classList.add('border-sky-600', 'text-sky-600');
+      tabTpl?.classList.remove('border-transparent', 'text-slate-500');
+      tabPast?.classList.remove('border-sky-600', 'text-sky-600');
+      tabPast?.classList.add('border-transparent', 'text-slate-500');
+    } else {
+      tabPast?.classList.add('border-sky-600', 'text-sky-600');
+      tabPast?.classList.remove('border-transparent', 'text-slate-500');
+      tabTpl?.classList.remove('border-sky-600', 'text-sky-600');
+      tabTpl?.classList.add('border-transparent', 'text-slate-500');
+    }
+  }
+
+  renderImportItemsList() {
+    const container = document.getElementById('template-items-scroll-list');
+    const search = document.getElementById('template-search-input')?.value.toLowerCase().trim() || '';
+    if (!container) return;
+
+    if (this.currentImportTab === 'templates') {
+      let tpls = window.storage.getTemplates();
+      if (search) {
+        tpls = tpls.filter(t => t.name.toLowerCase().includes(search) || (t.category && t.category.toLowerCase().includes(search)) || (t.subject && t.subject.toLowerCase().includes(search)));
+      }
+      if (tpls.length === 0) {
+        container.innerHTML = `<div class="p-6 text-center text-xs text-slate-400">ไม่พบแม่แบบที่ค้นหา</div>`;
+        return;
+      }
+      container.innerHTML = tpls.map(t => `
+        <div class="template-item-card ${this.selectedImportId === t.id ? 'active' : ''}" data-type="template" data-id="${t.id}" onclick="window.app.selectImportItem('template', '${t.id}')">
+          <div class="flex items-start gap-2.5">
+            <span class="text-xl shrink-0">${t.icon || '📄'}</span>
+            <div class="min-w-0 flex-1">
+              <span class="text-[10px] font-bold text-sky-700 bg-sky-100/80 px-1.5 py-0.5 rounded">${t.category}</span>
+              <h5 class="text-xs font-bold text-slate-800 mt-1 truncate">${t.name}</h5>
+              <p class="text-[11px] text-slate-500 truncate mt-0.5">${t.subject}</p>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    } else {
+      let docs = window.storage.getDocuments();
+      if (search) {
+        docs = docs.filter(d => (d.subject && d.subject.toLowerCase().includes(search)) || (d.docNumber && d.docNumber.toLowerCase().includes(search)));
+      }
+      if (docs.length === 0) {
+        container.innerHTML = `<div class="p-6 text-center text-xs text-slate-400">ไม่พบบันทึกข้อความเดิม</div>`;
+        return;
+      }
+      container.innerHTML = docs.map(d => {
+        const comp = window.storage.getCompany(d.companyId);
+        return `
+          <div class="template-item-card ${this.selectedImportId === d.id ? 'active' : ''}" data-type="memo" data-id="${d.id}" onclick="window.app.selectImportItem('memo', '${d.id}')">
+            <div class="flex items-start gap-2.5">
+              <span class="text-xl shrink-0">📑</span>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded font-mono">${d.docNumber || 'ฉบับร่าง'}</span>
+                  <span class="text-[10px] text-slate-400">${d.date || ''}</span>
+                </div>
+                <h5 class="text-xs font-bold text-slate-800 mt-1 truncate">${d.subject || 'ไม่ระบุชื่อเรื่อง'}</h5>
+                <p class="text-[11px] text-slate-500 truncate mt-0.5">${comp ? comp.name : ''}</p>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  selectImportItem(type, id) {
+    this.selectedImportType = type;
+    this.selectedImportId = id;
+
+    // Highlight in left list
+    document.querySelectorAll('.template-item-card').forEach(card => {
+      if (card.dataset.id === id && card.dataset.type === type) {
+        card.classList.add('active');
+      } else {
+        card.classList.remove('active');
+      }
+    });
+
+    const previewTarget = document.getElementById('template-preview-container');
+    const tip = document.getElementById('template-preview-status-tip');
+    if (!previewTarget) return;
+
+    if (type === 'template') {
+      const tpl = window.storage.getTemplate(id);
+      if (!tpl) return;
+      if (tip) tip.textContent = `กำลังแสดงตัวอย่างแม่แบบ: "${tpl.name}"`;
+
+      const comp = window.storage.getCompany(this.activeCompanyId) || window.storage.getCompanies()[0];
+      const mockDoc = {
+        companyId: comp.id,
+        docType: 'memo',
+        headerTitle: 'บันทึกภายใน',
+        date: new Date().toISOString().split('T')[0],
+        subject: tpl.subject,
+        toRecipient: tpl.toRecipient,
+        closing: tpl.closing,
+        content: tpl.content,
+        signerName: document.getElementById('form-signer-name-input')?.value.trim() || 'นิพนธ์ ศรแก้ว',
+        signerPosition: document.getElementById('form-signer-position-select')?.value || 'ผู้จัดการทั่วไป',
+        showFooter: false
+      };
+      previewTarget.innerHTML = this.buildDocHtml(mockDoc);
+    } else {
+      const doc = window.storage.getDocument(id);
+      if (!doc) return;
+      if (tip) tip.textContent = `กำลังแสดงตัวอย่างบันทึกเดิม: "${doc.docNumber || 'ฉบับร่าง'}" - ${doc.subject}`;
+      previewTarget.innerHTML = this.buildDocHtml(doc);
+    }
+  }
+
+  renderEmptyImportPreview() {
+    const previewTarget = document.getElementById('template-preview-container');
+    if (previewTarget) {
+      previewTarget.innerHTML = `<div class="p-12 text-center text-slate-400">ยังไม่มีบันทึกเดิมในระบบ</div>`;
+    }
+  }
+
+  applyImportContentOnly() {
+    if (!this.selectedImportId || !this.selectedImportType) {
+      this.showToast('กรุณาเลือกรายการที่ต้องการนำเข้าก่อน', 'warning');
+      return;
+    }
+    let content = '';
+    if (this.selectedImportType === 'template') {
+      const tpl = window.storage.getTemplate(this.selectedImportId);
+      if (tpl) content = tpl.content;
+    } else {
+      const doc = window.storage.getDocument(this.selectedImportId);
+      if (doc) content = doc.content;
+    }
+
+    if (!content) {
+      this.showToast('ไม่พบเนื้อหาในรายการที่เลือก', 'warning');
+      return;
+    }
+
+    const editor = document.getElementById('rich-content-editor');
+    if (editor) {
+      const current = editor.innerHTML.trim();
+      if (!current || current === '<p>มีความประสงค์ขออนุมัติดำเนินการ...</p>' || current === '<p><br></p>') {
+        editor.innerHTML = content;
+      } else {
+        editor.innerHTML = current + '<br>' + content;
+      }
+    }
+
+    this.closeModal('template-import-modal');
+    this.updateLivePreview();
+    this.showToast('แทรกเนื้อหาและตารางสำเร็จแล้ว', 'success');
+  }
+
+  applyImportFull() {
+    if (!this.selectedImportId || !this.selectedImportType) {
+      this.showToast('กรุณาเลือกรายการที่ต้องการนำเข้าก่อน', 'warning');
+      return;
+    }
+
+    if (this.selectedImportType === 'template') {
+      const tpl = window.storage.getTemplate(this.selectedImportId);
+      if (!tpl) return;
+      document.getElementById('form-subject-input').value = tpl.subject || '';
+      if (tpl.toRecipient) {
+        const recSelect = document.getElementById('form-recipient-select');
+        if (recSelect) {
+          let matched = false;
+          for (let opt of recSelect.options) {
+            if (opt.value === tpl.toRecipient) {
+              recSelect.value = tpl.toRecipient;
+              matched = true;
+              break;
+            }
+          }
+          if (!matched) {
+            recSelect.value = '__custom__';
+            const cust = document.getElementById('form-recipient-custom');
+            if (cust) {
+              cust.value = tpl.toRecipient;
+              document.getElementById('form-recipient-custom-group')?.classList.remove('hidden');
+            }
+          }
+        }
+      }
+      if (tpl.closing) {
+        const closeSelect = document.getElementById('form-closing-select');
+        if (closeSelect) {
+          let matched = false;
+          for (let opt of closeSelect.options) {
+            if (opt.value === tpl.closing) {
+              closeSelect.value = tpl.closing;
+              matched = true;
+              break;
+            }
+          }
+          if (!matched) {
+            closeSelect.value = '__custom__';
+            const cust = document.getElementById('form-closing-custom');
+            if (cust) {
+              cust.value = tpl.closing;
+              document.getElementById('form-closing-custom-group')?.classList.remove('hidden');
+            }
+          }
+        }
+      }
+      const editor = document.getElementById('rich-content-editor');
+      if (editor) editor.innerHTML = tpl.content || '';
+    } else {
+      const doc = window.storage.getDocument(this.selectedImportId);
+      if (!doc) return;
+      document.getElementById('form-subject-input').value = doc.subject || '';
+      if (doc.toRecipient) {
+        const recSelect = document.getElementById('form-recipient-select');
+        if (recSelect) recSelect.value = doc.toRecipient;
+      }
+      if (doc.closing) {
+        const closeSelect = document.getElementById('form-closing-select');
+        if (closeSelect) closeSelect.value = doc.closing;
+      }
+      if (doc.signerName) {
+        document.getElementById('form-signer-name-input').value = doc.signerName;
+      }
+      if (doc.signerPosition) {
+        document.getElementById('form-signer-position-select').value = doc.signerPosition;
+      }
+      const editor = document.getElementById('rich-content-editor');
+      if (editor) editor.innerHTML = doc.content || '';
+    }
+
+    this.closeModal('template-import-modal');
+    this.updateLivePreview();
+    this.showToast('นำเข้าข้อมูลสำเร็จแล้ว', 'success');
+  }
+
+  // =========================================================================
+  // Editor Formatting, Table & Image Insertion Helpers
+  // =========================================================================
+  insertTableToEditor() {
+    const tableHtml = `
+      <table style="width:100%; border-collapse:collapse; margin:14px 0;">
+        <thead>
+          <tr style="background:#f1f5f9;">
+            <th style="border:1px solid #cbd5e1; padding:8px; text-align:center; width:50px;">ลำดับ</th>
+            <th style="border:1px solid #cbd5e1; padding:8px; text-align:left;">รายการ / รายละเอียด</th>
+            <th style="border:1px solid #cbd5e1; padding:8px; text-align:center; width:80px;">จำนวน</th>
+            <th style="border:1px solid #cbd5e1; padding:8px; text-align:right; width:110px;">ราคา/หน่วย</th>
+            <th style="border:1px solid #cbd5e1; padding:8px; text-align:right; width:120px;">ราคารวม (บาท)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">1</td>
+            <td style="border:1px solid #cbd5e1; padding:8px;">ระบุรายการที่ต้องการ...</td>
+            <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">1</td>
+            <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">0.00</td>
+            <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">0.00</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">2</td>
+            <td style="border:1px solid #cbd5e1; padding:8px;">ระบุรายการที่ต้องการ...</td>
+            <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">1</td>
+            <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">0.00</td>
+            <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">0.00</td>
+          </tr>
+          <tr style="font-weight:bold; background:#f8fafc;">
+            <td colspan="4" style="border:1px solid #cbd5e1; padding:8px; text-align:right;">รวมเป็นเงินทั้งสิ้น</td>
+            <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">0.00</td>
+          </tr>
+        </tbody>
+      </table><p></p>
+    `;
+    document.execCommand('insertHTML', false, tableHtml);
+    this.updateLivePreview();
+  }
+
+  async handleEditorImageUpload(file) {
+    if (!file) return;
+    try {
+      const compressed = await window.Utils.compressImage(file, 800, 0.85);
+      const imgHtml = `<p><img src="${compressed}" style="max-width:100%; height:auto; border-radius:4px; margin:12px auto; display:block;" alt="ภาพประกอบ"></p><p></p>`;
+      document.execCommand('insertHTML', false, imgHtml);
+      this.updateLivePreview();
+      this.showToast('แทรกรูปภาพเรียบร้อยแล้ว', 'success');
+    } catch (err) {
+      this.showToast('ไม่สามารถแทรกรูปภาพได้: ' + err.message, 'error');
+    }
+  }
+
+  cleanEditorFormatting() {
+    const editor = document.getElementById('rich-content-editor');
+    if (!editor) return;
+    let html = editor.innerHTML;
+    html = html.replace(/<span[^>]*>/gi, '').replace(/<\/span>/gi, '');
+    html = html.replace(/font-family:[^;]+;/gi, '');
+    html = html.replace(/font-size:[^;]+;/gi, '');
+    html = html.replace(/color:[^;]+;/gi, '');
+    editor.innerHTML = html;
+    this.updateLivePreview();
+    this.showToast('ล้างฟอร์แมตแปลกปลอมเรียบร้อยแล้ว', 'info');
+  }
+
+  // =========================================================================
   // Modal Helpers
   // =========================================================================
   openModal(modalId) {
@@ -2932,12 +3391,58 @@ class MemoApp {
     document.querySelectorAll('.nav-item').forEach(el => {
       el.addEventListener('click', () => {
         const view = el.dataset.view;
-        if (view === 'editor') {
-          this.resetEditorForm();
+        if (window.innerWidth < 1024) {
+          document.getElementById('sidebar')?.classList.remove('mobile-open');
         }
         if (view) this.navigateTo(view);
       });
     });
+
+    // Company Settings Collapsible Header Toggle
+    document.getElementById('btn-toggle-company-settings')?.addEventListener('click', () => {
+      const content = document.getElementById('company-settings-content');
+      const chevron = document.getElementById('company-settings-chevron');
+      const badge = document.getElementById('company-settings-badge');
+      if (content) {
+        const isHidden = content.classList.contains('hidden');
+        if (isHidden) {
+          content.classList.remove('hidden');
+          chevron?.classList.add('rotate-180');
+          if (badge) badge.textContent = 'ซ่อนรายละเอียด';
+        } else {
+          content.classList.add('hidden');
+          chevron?.classList.remove('rotate-180');
+          if (badge) badge.textContent = 'แก้ไขโลโก้/ที่อยู่';
+        }
+      }
+    });
+
+    // Footer Toggle Live Refresh
+    document.getElementById('form-show-footer-toggle')?.addEventListener('change', () => {
+      this.updateLivePreview();
+    });
+
+    // Template & Past Memo Import Modal
+    document.getElementById('btn-open-template-import')?.addEventListener('click', () => this.openTemplateImportModal());
+    document.getElementById('tab-import-templates')?.addEventListener('click', () => this.switchImportTab('templates'));
+    document.getElementById('tab-import-past-memos')?.addEventListener('click', () => this.switchImportTab('past-memos'));
+    document.getElementById('template-search-input')?.addEventListener('input', () => this.renderImportItemsList());
+    document.getElementById('btn-apply-import-content-only')?.addEventListener('click', () => this.applyImportContentOnly());
+    document.getElementById('btn-apply-import-full')?.addEventListener('click', () => this.applyImportFull());
+
+    // Editor Table & Inline Image & Format Tools
+    document.getElementById('btn-editor-insert-table')?.addEventListener('click', () => this.insertTableToEditor());
+    document.getElementById('editor-image-file-input')?.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) {
+        this.handleEditorImageUpload(e.target.files[0]);
+        e.target.value = '';
+      }
+    });
+    document.getElementById('btn-editor-clean-format')?.addEventListener('click', () => this.cleanEditorFormatting());
+
+    // Autosave Draft Banner Action Buttons
+    document.getElementById('btn-restore-autosave-draft')?.addEventListener('click', () => this.restoreAutosaveDraft());
+    document.getElementById('btn-dismiss-autosave-draft')?.addEventListener('click', () => this.dismissAutosaveDraft());
 
     // Sidebar Togglers (Top, Icon, Bottom, Topbar)
     document.getElementById('sidebar-toggle-btn')?.addEventListener('click', () => this.toggleSidebar());
@@ -3123,6 +3628,13 @@ class MemoApp {
 
     // Topbar Quick Actions
     document.getElementById('btn-quick-new-doc')?.addEventListener('click', () => {
+      if (this.hasUserEditedForm()) {
+        const ok = confirm('คุณมีเนื้อหาที่กำลังพิมพ์อยู่ ต้องการล้างเพื่อเริ่มเอกสารใหม่หรือไม่?');
+        if (!ok) {
+          this.navigateTo('editor');
+          return;
+        }
+      }
       this.resetEditorForm();
       this.navigateTo('editor');
     });
@@ -3160,8 +3672,8 @@ class MemoApp {
     });
 
     document.getElementById('btn-zoom-out')?.addEventListener('click', () => {
-      if (this.currentZoom > 0.45) {
-        this.setPreviewScale(Math.max(this.currentZoom - 0.1, 0.45), false);
+      if (this.currentZoom > 0.32) {
+        this.setPreviewScale(Math.max(this.currentZoom - 0.08, 0.32), false);
       }
     });
 

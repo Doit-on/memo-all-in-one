@@ -146,6 +146,54 @@ h1, h2, h3, h4, .font-heading {
   margin-bottom: 0.9em;
 }
 
+/* Tables inside documents */
+.a4-sheet .doc-content table,
+#pdf-modal-sheet-wrapper .doc-content table,
+#template-preview-container .doc-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0;
+  font-size: 14pt;
+  line-height: 1.5;
+}
+
+.a4-sheet .doc-content table th,
+.a4-sheet .doc-content table td,
+#pdf-modal-sheet-wrapper .doc-content table th,
+#pdf-modal-sheet-wrapper .doc-content table td,
+#template-preview-container .doc-content table th,
+#template-preview-container .doc-content table td {
+  border: 1px solid #cbd5e1;
+  padding: 6px 10px;
+  vertical-align: middle;
+}
+
+.a4-sheet .doc-content table th,
+#pdf-modal-sheet-wrapper .doc-content table th,
+#template-preview-container .doc-content table th {
+  background-color: #f1f5f9;
+  font-weight: 700;
+  color: #1e293b;
+  text-align: center;
+}
+
+.a4-sheet .doc-content table td p,
+#pdf-modal-sheet-wrapper .doc-content table td p,
+#template-preview-container .doc-content table td p {
+  text-indent: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.a4-sheet .doc-content img,
+#pdf-modal-sheet-wrapper .doc-content img,
+#template-preview-container .doc-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  display: block;
+  margin: 12px auto;
+}
+
 /* Signature block */
 .signature-box {
   width: 260px;
@@ -767,4 +815,142 @@ h1, h2, h3, h4, .font-heading {
 @keyframes hintPulse {
   0%, 100% { transform: translateY(0); opacity: 0.85; }
   50% { transform: translateY(-4px); opacity: 1; box-shadow: 0 0 25px rgba(56, 189, 248, 0.5); }
+}
+
+/* ==========================================================================
+   Autosave Restore Banner & Template Import Modal Styles
+   ========================================================================== */
+#autosave-restore-banner {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 1px solid #93c5fd;
+  border-radius: 12px;
+  padding: 12px 18px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: 0 2px 8px -2px rgba(59, 130, 246, 0.15);
+  animation: slideDownFade 0.3s ease-out;
+}
+
+@keyframes slideDownFade {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Template Import Modal split view */
+.template-modal-body {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  height: 640px;
+  max-height: 75vh;
+  gap: 0;
+  overflow: hidden;
+}
+
+.template-list-sidebar {
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8fafc;
+  overflow: hidden;
+}
+
+.template-list-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.template-item-card {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.template-item-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px -2px rgba(59, 130, 246, 0.15);
+  transform: translateY(-1px);
+}
+
+.template-item-card.active {
+  border-color: #2563eb;
+  background: #eff6ff;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.template-preview-stage {
+  flex: 1;
+  background-color: #cbd5e1;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.template-preview-sheet {
+  background: #ffffff;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 680px;
+  min-height: 800px;
+  padding: 36px 42px;
+  border-radius: 4px;
+  font-family: 'Sarabun', sans-serif;
+  color: #0f172a;
+}
+
+/* Responsive Mobile Screen Adaptations */
+@media (max-width: 1023px) {
+  #sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    height: 100vh !important;
+    z-index: 50 !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  #sidebar.mobile-open {
+    transform: translateX(0) !important;
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.75) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .template-modal-body {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    height: auto;
+    max-height: 75vh;
+  }
+
+  .template-list-sidebar {
+    max-height: 200px;
+    border-right: none;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .template-preview-stage {
+    padding: 12px;
+  }
+
+  .template-preview-sheet {
+    padding: 20px 16px;
+    min-height: auto;
+  }
+
+  #pdf-modal-sheet-wrapper {
+    max-width: 100% !important;
+    padding: 16px !important;
+  }
 }

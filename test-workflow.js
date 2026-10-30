@@ -6,6 +6,9 @@
  * 4. Test Google Sheet Webhook payload format
  */
 
+const fs = require('fs');
+const path = require('path');
+
 // Mock window and localStorage
 const storageMap = {};
 global.localStorage = {
@@ -179,11 +182,11 @@ console.log('LMI DOC Name:', lmiName);
 console.log('NNAP PDF Name:', nnaName);
 
 if (
-  twpName === 'TWP ขออนุมัติ AI+2026-10-22.pdf' &&
-  lmiName === 'LMI ระบบคลังสินค้า+2026-10-22.doc' &&
-  nnaName === 'NNAP หนังสือรับรองเงินเดือน+2026-10-22.pdf'
+  twpName === 'TWP ขออนุมัติ AI 2026-10-22.pdf' &&
+  lmiName === 'LMI ระบบคลังสินค้า 2026-10-22.doc' &&
+  nnaName === 'NNAP หนังสือรับรองเงินเดือน 2026-10-22.pdf'
 ) {
-  console.log('PASS: Standardized corporate filenames strictly match requirements (TWP, LMI, NNAP)!');
+  console.log('PASS: Standardized corporate filenames strictly match requirements (TWP, LMI, NNAP without +)!');
 } else {
   console.error('FAIL: Standardized corporate filename mismatch');
   process.exit(1);
@@ -248,6 +251,89 @@ if (updateResult.success && updateResult.doc.docNumber === 'ทวพ. 005/2569'
   console.log('PASS: Document number can be safely updated/customized with audit log synchronization!');
 } else {
   console.error('FAIL: updateDocumentNumber failed');
+  process.exit(1);
+}
+
+console.log('\n--- TEST 8: Templates Master Data & Autosave Draft Mechanics ---');
+const templates = window.storage.getTemplates();
+console.log('Loaded Templates Count:', templates.length);
+if (templates.length >= 6) {
+  console.log('PASS: Loaded ready-to-use business templates successfully!');
+} else {
+  console.error('FAIL: Less than 6 templates found');
+  process.exit(1);
+}
+
+const purchaseTpl = window.storage.getTemplate('tpl-purchase');
+if (purchaseTpl && purchaseTpl.content.includes('<table')) {
+  console.log('PASS: Purchase template contains structured A4 table with items and pricing!');
+} else {
+  console.error('FAIL: Purchase template missing or does not contain table');
+  process.exit(1);
+}
+
+// Test Autosave Draft Cycle
+window.storage.setAutosaveDraft({ subject: 'ทดสอบร่างเอกสาร', content: '<p>เนื้อหาร่าง</p>' });
+const retrievedDraft = window.storage.getAutosaveDraft();
+if (retrievedDraft && retrievedDraft.subject === 'ทดสอบร่างเอกสาร' && retrievedDraft.savedAt) {
+  console.log('PASS: Autosave draft saved and retrieved with timestamp!');
+} else {
+  console.error('FAIL: Autosave draft retrieval failed');
+  process.exit(1);
+}
+
+window.storage.clearAutosaveDraft();
+const clearedDraft = window.storage.getAutosaveDraft();
+if (!clearedDraft) {
+  console.log('PASS: Autosave draft cleanly cleared!');
+} else {
+  console.error('FAIL: Autosave draft was not cleared');
+  process.exit(1);
+}
+
+console.log('\n--- TEST 9: UI Structure Verification in index.dev.html ---');
+const devHtml = fs.readFileSync(path.join(__dirname, 'index.dev.html'), 'utf-8');
+const checks = [
+  { id: 'template-import-modal', desc: 'Template & Past Memo Import Modal (Split View)' },
+  { id: 'autosave-restore-banner', desc: 'Autosave Recovery Banner' },
+  { id: 'btn-open-template-import', desc: 'Template Library Trigger Button' },
+  { id: 'btn-editor-insert-table', desc: 'Table Insertion Button' },
+  { id: 'btn-editor-insert-image', desc: 'Inline Image Upload Button' },
+  { id: 'btn-editor-clean-format', desc: 'Format Cleaner Button' },
+  { id: 'form-show-footer-toggle', desc: 'Company Footer Display Toggle' },
+  { id: 'btn-toggle-company-settings', desc: 'Collapsible Company Box Header' }
+];
+
+for (const c of checks) {
+  if (devHtml.includes(`id="${c.id}"`)) {
+    console.log(`PASS: Found ${c.desc} (${c.id})`);
+  } else {
+    console.error(`FAIL: Missing ${c.desc} (${c.id}) in index.dev.html`);
+    process.exit(1);
+  }
+}
+
+// Check Subject field comes before Recipient field
+const subjectIdx = devHtml.indexOf('id="form-subject-input"');
+const recipientIdx = devHtml.indexOf('id="form-recipient-select"');
+if (subjectIdx !== -1 && recipientIdx !== -1 && subjectIdx < recipientIdx) {
+  console.log('PASS: Field order strictly matches Thai corporate protocol: "เรื่อง" precedes "เรียน"!');
+} else {
+  console.error('FAIL: "เรื่อง" should precede "เรียน" in form layout');
+  process.exit(1);
+}
+
+console.log('\n--- TEST 10: Bundled Standalone index.html Verification ---');
+const bundleHtml = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf-8');
+console.log('Bundle file size:', (bundleHtml.length / 1024).toFixed(1), 'KB');
+if (bundleHtml.includes('template-import-modal') &&
+    bundleHtml.includes('autosave-restore-banner') &&
+    bundleHtml.includes('tpl-purchase') &&
+    bundleHtml.includes('btn-editor-insert-table') &&
+    bundleHtml.includes('hasUserEditedForm')) {
+  console.log('PASS: Standalone bundle contains all modals, scripts, templates, and autosave mechanics!');
+} else {
+  console.error('FAIL: Standalone bundle is missing key components');
   process.exit(1);
 }
 

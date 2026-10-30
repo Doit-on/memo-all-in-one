@@ -12,7 +12,9 @@ const STORAGE_KEYS = {
   RUNNING_LOGS: 'memo_running_logs_v1',
   RUNNING_COUNTERS: 'memo_counters_v1',
   SETTINGS: 'memo_settings_v1',
-  ACTIVE_COMPANY: 'memo_active_company_v1'
+  ACTIVE_COMPANY: 'memo_active_company_v1',
+  TEMPLATES: 'memo_templates_v1',
+  AUTOSAVE_DRAFT: 'memo_autosave_draft_v1'
 };
 
 // Initial Company Master Data
@@ -176,6 +178,212 @@ const DEFAULT_SAMPLE_DOCUMENTS = [
   }
 ];
 
+// Master Ready-to-Use Templates
+const DEFAULT_TEMPLATES = [
+  {
+    id: 'tpl-purchase',
+    category: 'จัดซื้อ-จัดจ้าง',
+    name: 'ขออนุมัติจัดซื้ออุปกรณ์ / ครุภัณฑ์ / บริการ',
+    icon: '🛒',
+    subject: 'ขออนุมัติจัดซื้ออุปกรณ์และครุภัณฑ์สำนักงาน',
+    toRecipient: 'กรรมการผู้จัดการ',
+    closing: 'จึงเรียนมาเพื่อโปรดพิจารณาอนุมัติ',
+    content: `<p>ด้วยฝ่ายงานมีความประสงค์จะขออนุมัติจัดซื้ออุปกรณ์และครุภัณฑ์ เพื่อสนับสนุนการปฏิบัติงานให้มีประสิทธิภาพยิ่งขึ้นและรองรับการทำงานของพนักงาน โดยมีรายการและความจำเป็นดังต่อไปนี้</p>
+<table style="width:100%; border-collapse:collapse; margin:15px 0;">
+  <thead>
+    <tr style="background:#f1f5f9;">
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:center; width:50px;">ลำดับ</th>
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:left;">รายการ / รายละเอียด</th>
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:center; width:80px;">จำนวน</th>
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:right; width:100px;">ราคา/หน่วย</th>
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:right; width:110px;">ราคารวม (บาท)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">1</td>
+      <td style="border:1px solid #cbd5e1; padding:8px;">อุปกรณ์คอมพิวเตอร์และอุปกรณ์ต่อพ่วงสำหรับการพัฒนาระบบ</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">1 ชุด</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">25,000.00</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">25,000.00</td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">2</td>
+      <td style="border:1px solid #cbd5e1; padding:8px;">โควต้าบริการ Cloud / Gemini AI Package ประจำเดือน</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">1 สิทธิ์</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">3,500.00</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">3,500.00</td>
+    </tr>
+    <tr style="font-weight:bold; background:#f8fafc;">
+      <td colspan="4" style="border:1px solid #cbd5e1; padding:8px; text-align:right;">รวมเป็นเงินทั้งสิ้น (รวมภาษีมูลค่าเพิ่ม)</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">28,500.00</td>
+    </tr>
+  </tbody>
+</table>
+<p>ทั้งนี้ การจัดซื้อดังกล่าวมีงบประมาณรองรับตามแผนงานประจำปีเรียบร้อยแล้ว รายละเอียดเอกสารใบเสนอราคาแนบมาพร้อมนี้</p>`
+  },
+  {
+    id: 'tpl-project',
+    category: 'โครงการและงบประมาณ',
+    name: 'ขออนุมัติโครงการ / กิจกรรม / อบรมสัมมนา',
+    icon: '📊',
+    subject: 'ขออนุมัติจัดโครงการพัฒนาและฝึกอบรมเชิงปฏิบัติการ',
+    toRecipient: 'กรรมการผู้จัดการ',
+    closing: 'จึงเรียนมาเพื่อโปรดพิจารณาอนุมัติงบประมาณและแผนการดำเนินงาน',
+    content: `<p>ตามที่บริษัทฯ มีนโยบายส่งเสริมและยกระดับศักยภาพบุคลากรและพัฒนานวัตกรรมการทำงาน ฝ่ายงานจึงได้จัดทำโครงการอบรมเชิงปฏิบัติการขึ้น โดยมีรายละเอียดวัตถุประสงค์และแผนการดำเนินงานดังนี้</p>
+<p><strong>1. วัตถุประสงค์:</strong> เพื่อเพิ่มทักษะความรู้ความเข้าใจในการประยุกต์ใช้เทคโนโลยีดิจิทัลและ AI ในกระบวนการทำงานให้รวดเร็วและมีประสิทธิภาพ</p>
+<p><strong>2. กลุ่มเป้าหมาย:</strong> พนักงานและผู้เกี่ยวข้อง จำนวน 20 คน</p>
+<p><strong>3. ระยะเวลาและสถานที่:</strong> วันที่ 15 สิงหาคม 2569 ณ ห้องประชุมใหญ่บริษัทฯ</p>
+<p><strong>4. ประมาณการค่าใช้จ่าย:</strong></p>
+<table style="width:100%; border-collapse:collapse; margin:15px 0;">
+  <thead>
+    <tr style="background:#f1f5f9;">
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:center; width:50px;">ลำดับ</th>
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:left;">รายการค่าใช้จ่าย</th>
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:right; width:120px;">จำนวนเงิน (บาท)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">1</td>
+      <td style="border:1px solid #cbd5e1; padding:8px;">ค่าตอบแทนวิทยากรผู้เชี่ยวชาญ (6 ชั่วโมง)</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">30,000.00</td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">2</td>
+      <td style="border:1px solid #cbd5e1; padding:8px;">ค่าอาหารกลางวันและอาหารว่างผู้เข้าอบรม</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">15,000.00</td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">3</td>
+      <td style="border:1px solid #cbd5e1; padding:8px;">ค่าเอกสารและสื่ออุปกรณ์การเรียนรู้ E-Learning</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">12,000.00</td>
+    </tr>
+    <tr style="font-weight:bold; background:#f8fafc;">
+      <td colspan="2" style="border:1px solid #cbd5e1; padding:8px; text-align:right;">รวมงบประมาณทั้งสิ้น</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">57,000.00</td>
+    </tr>
+  </tbody>
+</table>
+<p><strong>5. ประโยชน์ที่คาดว่าจะได้รับ:</strong> พนักงานสามารถนำเครื่องมือดิจิทัลไปประยุกต์ใช้ลดขั้นตอนการทำงานได้จริง และสร้างโมเดลการอบรมสำหรับต่อยอดแก่ลูกค้าภายนอก</p>`
+  },
+  {
+    id: 'tpl-travel',
+    category: 'เบิกจ่ายและสวัสดิการ',
+    name: 'ขออนุมัติเดินทางปฏิบัติงานนอกสถานที่ / เบิกเบี้ยเลี้ยง',
+    icon: '🚗',
+    subject: 'ขออนุมัติเดินทางไปปฏิบัติงานและเบิกจ่ายค่าใช้จ่ายในการเดินทาง',
+    toRecipient: 'ผู้จัดการทั่วไป',
+    closing: 'จึงเรียนมาเพื่อโปรดพิจารณาอนุมัติ',
+    content: `<p>เนื่องด้วยฝ่ายงานมีความจำเป็นต้องเดินทางไปปฏิบัติงานตรวจเช็คหน้างานและประสานงานกับลูกค้าภายนอกสถานที่ จึงขออนุมัติการเดินทางและเบิกจ่ายค่าใช้จ่ายตามระเบียบบริษัทฯ ดังนี้</p>
+<p><strong>1. บุคลากรผู้เดินทาง:</strong> นายสมเกียรติ มั่นคง และทีมงานรวม 3 คน</p>
+<p><strong>2. สถานที่และภารกิจ:</strong> เยี่ยมชมและประสานงานติดตั้งระบบ ณ หน่วยงานลูกค้า จ.ปทุมธานี</p>
+<p><strong>3. วันเวลาเดินทาง:</strong> วันที่ 10 พฤศจิกายน 2569 เวลา 08:30 - 17:30 น.</p>
+<p><strong>4. ประมาณการค่าใช้จ่าย:</strong></p>
+<table style="width:100%; border-collapse:collapse; margin:15px 0;">
+  <thead>
+    <tr style="background:#f1f5f9;">
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:center; width:50px;">ลำดับ</th>
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:left;">รายการ</th>
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:right; width:120px;">จำนวนเงิน (บาท)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">1</td>
+      <td style="border:1px solid #cbd5e1; padding:8px;">ค่าน้ำมันเชื้อเพลิงและค่าทางด่วน (ตามใบเสร็จจริง)</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">1,800.00</td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">2</td>
+      <td style="border:1px solid #cbd5e1; padding:8px;">ค่าเบี้ยเลี้ยงปฏิบัติงานนอกสถานที่ (3 คน x 300 บาท)</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">900.00</td>
+    </tr>
+    <tr style="font-weight:bold; background:#f8fafc;">
+      <td colspan="2" style="border:1px solid #cbd5e1; padding:8px; text-align:right;">รวมเป็นเงินทั้งสิ้น</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">2,700.00</td>
+    </tr>
+  </tbody>
+</table>`
+  },
+  {
+    id: 'tpl-meeting',
+    category: 'การประชุม',
+    name: 'ระเบียบวาระการประชุม / บันทึกการประชุม',
+    icon: '📝',
+    subject: 'แจ้งระเบียบวาระการประชุมคณะกรรมการบริหาร ประจำเดือน',
+    toRecipient: 'คณะกรรมการบริหารและผู้เกี่ยวข้องทุกท่าน',
+    closing: 'จึงเรียนมาเพื่อโปรดทราบและเข้าร่วมการประชุมตามกำหนดเวลา',
+    content: `<p>บริษัทฯ ขอเรียนเชิญเข้าร่วมการประชุมคณะกรรมการบริหารประจำเดือน เพื่อติดตามความคืบหน้าการดำเนินงานและพิจารณาประเด็นสำคัญขององค์กร โดยมีรายละเอียดดังต่อไปนี้</p>
+<p><strong>วัน/เวลา:</strong> วันศุกร์ที่ 28 พฤศจิกายน 2569 เวลา 13:30 - 16:30 น.<br>
+<strong>สถานที่:</strong> ห้องประชุม 1 อาคารสำนักงานใหญ่ (หรือผ่านระบบ Zoom Meeting)</p>
+<p><strong>ระเบียบวาระการประชุม:</strong></p>
+<p><strong>วาระที่ 1:</strong> เรื่องที่ประธานแจ้งให้ที่ประชุมทราบ<br>
+<strong>วาระที่ 2:</strong> รับรองรายงานการประชุมครั้งที่ผ่านมา<br>
+<strong>วาระที่ 3:</strong> เรื่องสืบเนื่องจากการประชุมครั้งก่อน<br>
+&nbsp;&nbsp;3.1 ความคืบหน้าระบบ Memo All-in-One และ Google Sheet Integration<br>
+&nbsp;&nbsp;3.2 การย้ายระบบ Cloud และควบคุมโควต้า AI<br>
+<strong>วาระที่ 4:</strong> เรื่องเพื่อพิจารณา<br>
+&nbsp;&nbsp;4.1 แผนงบประมาณและเป้าหมายประจำไตรมาสถัดไป<br>
+<strong>วาระที่ 5:</strong> เรื่องอื่นๆ (ถ้ามี)</p>`
+  },
+  {
+    id: 'tpl-announcement',
+    category: 'ประกาศและนโยบาย',
+    name: 'ประกาศระเบียบและแนวทางปฏิบัติภายในองค์กร',
+    icon: '📢',
+    subject: 'แนวทางการรักษาความปลอดภัยข้อมูลและการใช้งานระบบสารสนเทศ',
+    toRecipient: 'พนักงานทุกท่าน',
+    closing: 'จึงประกาศมาเพื่อทราบและถือปฏิบัติอย่างเคร่งครัดตั้งแต่บัดนี้เป็นต้นไป',
+    content: `<p>เพื่อให้การดำเนินงานด้านสารสนเทศและการรักษาความปลอดภัยของข้อมูลภายในองค์กรเป็นไปด้วยความเรียบร้อย มีมาตรฐาน และป้องกันความเสียหายที่อาจเกิดขึ้น บริษัทฯ จึงกำหนดแนวทางปฏิบัติให้พนักงานทุกคนถือปฏิบัติดังนี้</p>
+<ol style="margin-left: 20px; line-height: 1.8;">
+  <li>ห้ามเผยแพร่หรือส่งต่อเอกสารสำคัญ ข้อมูลลูกค้า หรือรหัสผ่านของระบบงานแก่บุคคลภายนอกโดยไม่ได้รับอนุญาต</li>
+  <li>การเข้าถึงเอกสารและฐานข้อมูลผ่าน Google Drive และ Google Sheets ต้องกระทำผ่านบัญชีอีเมลทางการของบริษัทฯ เท่านั้น</li>
+  <li>กำหนดให้เปลี่ยนรหัสผ่านระบบงานทุกๆ 90 วัน และตั้งรหัสผ่านที่มีความยาวไม่น้อยกว่า 8 ตัวอักษร</li>
+  <li>หากพบความผิดปกติหรือมีข้อสงสัยเกี่ยวกับระบบ ขอให้แจ้งฝ่ายไอทีและธุรการโดยทันที</li>
+</ol>`
+  },
+  {
+    id: 'tpl-report',
+    category: 'รายงานการปฏิบัติงาน',
+    name: 'รายงานผลการปฏิบัติงาน / ความคืบหน้าประจำเดือน',
+    icon: '📈',
+    subject: 'รายงานผลการดำเนินงานและความคืบหน้าโครงการประจำเดือน',
+    toRecipient: 'ผู้จัดการทั่วไป',
+    closing: 'จึงเรียนมาเพื่อโปรดทราบผลการดำเนินงาน',
+    content: `<p>ฝ่ายงานขอสรุปรายงานผลการปฏิบัติงานและความคืบหน้าของโครงการสำคัญ ประจำเดือนที่ผ่านมา โดยมีรายละเอียดผลลัพธ์การทำงานดังนี้</p>
+<table style="width:100%; border-collapse:collapse; margin:15px 0;">
+  <thead>
+    <tr style="background:#f1f5f9;">
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:center; width:50px;">ลำดับ</th>
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:left;">ภารกิจ / โครงการ</th>
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:center; width:120px;">เป้าหมาย</th>
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:center; width:120px;">ผลการดำเนินงาน</th>
+      <th style="border:1px solid #cbd5e1; padding:8px; text-align:center; width:90px;">สถานะ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">1</td>
+      <td style="border:1px solid #cbd5e1; padding:8px;">ปรับปรุงระบบบันทึกข้อความ Memo All-in-One</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">100%</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">100%</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center; color:#16a34a; font-weight:bold;">เรียบร้อย</td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">2</td>
+      <td style="border:1px solid #cbd5e1; padding:8px;">เชื่อมต่อฐานข้อมูล Google Sheets & Google Drive</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">100%</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">100%</td>
+      <td style="border:1px solid #cbd5e1; padding:8px; text-align:center; color:#16a34a; font-weight:bold;">เรียบร้อย</td>
+    </tr>
+  </tbody>
+</table>
+<p><strong>ปัญหาและอุปสรรค:</strong> -</p>
+<p><strong>แผนการดำเนินงานในเดือนถัดไป:</strong> ติดตามการใช้งานของพนักงานและพัฒนาฟีเจอร์เพิ่มเติมตามข้อเสนอแนะ</p>`
+  }
+];
+
 class StorageManager {
   constructor() {
     this.init();
@@ -255,6 +463,9 @@ class StorageManager {
         nueanam: { memo: 0, announcement: 0, salary_cert: 1, work_cert: 0 }
       };
       localStorage.setItem(STORAGE_KEYS.RUNNING_COUNTERS, JSON.stringify(counters));
+    }
+    if (!localStorage.getItem(STORAGE_KEYS.TEMPLATES)) {
+      localStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(DEFAULT_TEMPLATES));
     }
   }
 
@@ -792,6 +1003,60 @@ class StorageManager {
   verifyAdminPin(pin) {
     const settings = this.getSettings();
     return pin === settings.adminPin;
+  }
+
+  // Ready-to-Use Templates
+  getTemplates() {
+    const tpls = this.get(STORAGE_KEYS.TEMPLATES);
+    if (!tpls || !Array.isArray(tpls) || tpls.length === 0) {
+      return DEFAULT_TEMPLATES;
+    }
+    return tpls;
+  }
+
+  getTemplate(id) {
+    const list = this.getTemplates();
+    return list.find(t => t.id === id) || null;
+  }
+
+  saveTemplate(tpl) {
+    const list = this.getTemplates();
+    const existingIdx = list.findIndex(t => t.id === tpl.id);
+    if (existingIdx >= 0) {
+      list[existingIdx] = tpl;
+    } else {
+      list.unshift(tpl);
+    }
+    this.set(STORAGE_KEYS.TEMPLATES, list);
+    return tpl;
+  }
+
+  deleteTemplate(id) {
+    let list = this.getTemplates();
+    list = list.filter(t => t.id !== id);
+    this.set(STORAGE_KEYS.TEMPLATES, list);
+    return true;
+  }
+
+  // Autosave Draft
+  getAutosaveDraft() {
+    return this.get(STORAGE_KEYS.AUTOSAVE_DRAFT);
+  }
+
+  setAutosaveDraft(data) {
+    return this.set(STORAGE_KEYS.AUTOSAVE_DRAFT, {
+      ...data,
+      savedAt: new Date().toISOString()
+    });
+  }
+
+  clearAutosaveDraft() {
+    try {
+      localStorage.removeItem(STORAGE_KEYS.AUTOSAVE_DRAFT);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }
 
